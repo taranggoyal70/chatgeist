@@ -139,6 +139,7 @@ button:disabled { opacity: .38; cursor: not-allowed; }
 .control-panel button { min-height: 44px; border: 1px solid rgba(152,165,189,.28); background: rgba(255,255,255,.025); color: var(--paper); padding: 10px 12px; transition: border-color 160ms, background 160ms, transform 160ms; }
 .control-panel button:hover:not(:disabled) { border-color: var(--cyan); transform: translateY(-1px); }
 .segmented button.active { background: rgba(114,247,255,.1); border-color: var(--cyan); color: var(--cyan); }
+.segmented button.active::before { content: "✓ "; color: var(--gold); }
 .control-panel .action { background: linear-gradient(135deg, rgba(167,139,250,.25), rgba(114,247,255,.16)); border-color: rgba(114,247,255,.68); font-weight: 650; }
 .control-panel .action--summon { min-height: 50px; text-transform: uppercase; letter-spacing: .12em; font-size: 11px; }
 .control-panel .lock-action { min-height: 54px; border-color: var(--gold); background: var(--gold); color: var(--void); font-weight: 750; text-transform: uppercase; letter-spacing: .12em; }

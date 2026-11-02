@@ -11,7 +11,7 @@ const phaseLabel: Record<ChatgeistState["phase"], string> = {
   grounding: "Finding the shared signal",
   "answer-ready": "A grounded voice has formed",
   speaking: "The room speaks",
-  locked: "Decision locked by chat",
+  locked: "Decision locked by streamer",
   remembered: "Memory sealed",
   error: "The signal broke"
 };
@@ -24,9 +24,9 @@ export function Overlay({ state, compact = false }: { state: ChatgeistState; com
     const timer = window.setInterval(() => setNow(Date.now()), 100);
     return () => window.clearInterval(timer);
   }, [state.phase]);
-  const totalCollectionMs = state.collectionStartedAt && state.collectionEndsAt ? state.collectionEndsAt - state.collectionStartedAt : 1;
-  const remainingMs = state.collectionEndsAt ? Math.max(0, state.collectionEndsAt - now) : 0;
-  const collectionProgress = state.collectionStartedAt ? Math.min(1, Math.max(0, (now - state.collectionStartedAt) / totalCollectionMs)) : 0;
+  const totalCollectionMs = state.collectionWindow ? state.collectionWindow.endsAt - state.collectionWindow.startedAt : 1;
+  const remainingMs = state.collectionWindow ? Math.max(0, state.collectionWindow.endsAt - now) : 0;
+  const collectionProgress = state.collectionWindow ? Math.min(1, Math.max(0, (now - state.collectionWindow.startedAt) / totalCollectionMs)) : 0;
   const heading = state.phase === "locked" && state.decision ? state.decision.title : state.phase === "dormant" ? "Summon your community." : state.question || "The room is becoming visible.";
   const answer = state.phase === "locked" && state.decision ? state.decision.objective : state.answer;
   const factionTotal = Math.max(1, state.split.leftCount + state.split.rightCount);
@@ -37,7 +37,7 @@ export function Overlay({ state, compact = false }: { state: ChatgeistState; com
       <div className="observatory__chrome">
         <header className="signal-header">
           <div><span className="sigil">◐</span><strong>CHATGEIST</strong></div>
-          <div className="mode-ribbon" data-mode={state.provenance}>{state.provenance === "simulated" ? "SIMULATED CHAT" : state.provenance === "fallback" ? "GROUNDED FALLBACK" : "LIVE TWITCH"}</div>
+          <div className="mode-ribbon" data-mode={state.provenance}>{state.mode === "simulator" ? `SIMULATED CHAT${state.provenance === "fallback" ? " · FALLBACK" : ""}` : `LIVE TWITCH${state.provenance === "fallback" ? " · FALLBACK" : ""}`}</div>
         </header>
 
         {state.phase === "collecting" && <section className="collection-window" aria-label={`${Math.ceil(remainingMs / 1000)} seconds left in the decision window`}>
@@ -74,10 +74,10 @@ export function Overlay({ state, compact = false }: { state: ChatgeistState; com
         </div>}
 
         <footer className="signal-footer">
-          <div className="axis"><span>Energy</span><output>{Math.round(state.axes.energy * 100)}</output><b style={{ width: `${state.axes.energy * 100}%` }} /></div>
-          <div className="axis"><span>Consensus</span><output>{Math.round(state.axes.consensus * 100)}</output><b style={{ width: `${state.axes.consensus * 100}%` }} /></div>
-          <div className="axis"><span>Warmth</span><output>{Math.round(state.axes.warmth * 100)}</output><b style={{ width: `${state.axes.warmth * 100}%` }} /></div>
-          <div className="axis"><span>Chaos</span><output>{Math.round(state.axes.chaos * 100)}</output><b style={{ width: `${state.axes.chaos * 100}%` }} /></div>
+          <div className="axis" role="progressbar" aria-label="Energy" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(state.axes.energy * 100)}><span>Energy</span><output>{Math.round(state.axes.energy * 100)}</output><b style={{ width: `${state.axes.energy * 100}%` }} /></div>
+          <div className="axis" role="progressbar" aria-label="Consensus" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(state.axes.consensus * 100)}><span>Consensus</span><output>{Math.round(state.axes.consensus * 100)}</output><b style={{ width: `${state.axes.consensus * 100}%` }} /></div>
+          <div className="axis" role="progressbar" aria-label="Warmth" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(state.axes.warmth * 100)}><span>Warmth</span><output>{Math.round(state.axes.warmth * 100)}</output><b style={{ width: `${state.axes.warmth * 100}%` }} /></div>
+          <div className="axis" role="progressbar" aria-label="Chaos" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(state.axes.chaos * 100)}><span>Chaos</span><output>{Math.round(state.axes.chaos * 100)}</output><b style={{ width: `${state.axes.chaos * 100}%` }} /></div>
           <p>{state.statusText}</p>
         </footer>
       </div>

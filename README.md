@@ -43,6 +43,7 @@ Fast Twitch chat becomes impossible to perceive as a community. Polls reduce it 
 - Chat is untrusted evidence, never system instruction.
 - OpenAI output is constrained to a Zod schema.
 - Every returned source ID must belong to the active evidence window.
+- A decision requires at least five eligible messages from three unique voices; normalized-text, upstream-ID, and five-second per-chatter deduplication are enforced locally.
 - Live, simulated, and fallback modes are always labeled.
 - The streamer decides when the entity may speak and can clear the session immediately.
 - Tokens and API keys stay server-side in `.env.local`.

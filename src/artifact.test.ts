@@ -12,6 +12,9 @@ describe("decision artifact", () => {
       decision: { title: "Chat <wins>", objective: "Do A & B", lockedAt: 1, participantCount: 4, sourceCount: 1 },
       messages: [{ id: "1", userId: "u", userName: "Maya", text: "one <life>", timestamp: 1, source: "simulator" }],
       sourceIds: ["1"],
+      memoryPhrase: "Choose <wisely>",
+      axes: { energy: 0.8, consensus: 0.4, warmth: 0.7, chaos: 0.6 },
+      mode: "simulator",
       provenance: "simulated"
     } as ChatgeistState;
     const svg = buildDecisionArtifact(state);

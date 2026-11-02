@@ -22,7 +22,7 @@ Chatgeist gives viewers an immediate sense that their participation changes the 
 
 ## How We Used AI
 
-Chatgeist uses OpenAI Structured Outputs to convert a bounded window of eligible chat into a grounded response, representative source IDs, a confidence value, and visual mood axes. Those mood axes drive the spirit's procedural form, while OpenAI text-to-speech gives the summoned answer a distinctive voice. If an AI request is unavailable, Chatgeist falls back deterministically and labels the provenance instead of inventing a successful state.
+Chatgeist uses OpenAI Structured Outputs to convert a bounded window of eligible chat into a grounded response, representative source IDs, supported faction IDs, and visual mood axes. Those mood axes drive the spirit's procedural form, while OpenAI text-to-speech gives the summoned answer a distinctive voice. If an AI request is unavailable, Chatgeist falls back to transparent lexical clustering and labels the provenance instead of inventing a successful state.
 
 ## How We Used Codex
 

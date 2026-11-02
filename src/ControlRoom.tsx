@@ -36,9 +36,9 @@ export function ControlRoom({ state, error, act }: { state: ChatgeistState; erro
 
         <section className="control-section">
           <p className="eyebrow">Input source</p>
-          <div className="segmented">
-            <button className={state.mode === "simulator" ? "active" : ""} onClick={() => run("/api/mode", { mode: "simulator" })}>Simulator</button>
-            <button className={state.mode === "twitch" ? "active" : ""} onClick={() => run("/api/mode", { mode: "twitch" })} disabled={state.health.twitch !== "ready"}>Twitch</button>
+          <div className="segmented" role="radiogroup" aria-label="Chat input source">
+            <button role="radio" aria-checked={state.mode === "simulator"} className={state.mode === "simulator" ? "active" : ""} onClick={() => run("/api/mode", { mode: "simulator" })}>Simulator</button>
+            <button role="radio" aria-checked={state.mode === "twitch"} className={state.mode === "twitch" ? "active" : ""} onClick={() => run("/api/mode", { mode: "twitch" })} disabled={state.health.twitch !== "ready"}>Twitch</button>
           </div>
           <button className="action action--summon" onClick={() => run("/api/summon")} disabled={busy}>Summon the room</button>
         </section>

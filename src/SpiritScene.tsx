@@ -1,12 +1,12 @@
 import { Float, MeshDistortMaterial, Sparkles, Stars } from "@react-three/drei";
 import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useMemo, useRef, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import type { Group, Mesh } from "three";
 import { Color, MathUtils } from "three";
 import type { ChatgeistState, SpiritAxes } from "./types";
 
-function SpiritBody({ axes, side = 0 }: { axes: SpiritAxes; side?: number }) {
+function SpiritBody({ axes, side = 0, reducedMotion = false }: { axes: SpiritAxes; side?: number; reducedMotion?: boolean }) {
   const group = useRef<Group>(null);
   const core = useRef<Mesh>(null);
   const color = useMemo(() => {
@@ -17,6 +17,11 @@ function SpiritBody({ axes, side = 0 }: { axes: SpiritAxes; side?: number }) {
 
   useFrame(({ clock }, delta) => {
     if (!group.current || !core.current) return;
+    if (reducedMotion) {
+      group.current.rotation.set(0, 0, 0);
+      core.current.scale.setScalar(1);
+      return;
+    }
     group.current.rotation.y += delta * (0.18 + axes.energy * 0.55) * (side || 1);
     group.current.rotation.z = Math.sin(clock.elapsedTime * 0.4) * axes.chaos * 0.18;
     const scale = 1 + Math.sin(clock.elapsedTime * (1.2 + axes.energy * 2.2)) * (0.025 + axes.energy * 0.045);
@@ -24,7 +29,7 @@ function SpiritBody({ axes, side = 0 }: { axes: SpiritAxes; side?: number }) {
   });
 
   return (
-    <Float speed={1.2 + axes.energy} rotationIntensity={0.18 + axes.chaos * 0.45} floatIntensity={0.35}>
+    <Float speed={reducedMotion ? 0 : 1.2 + axes.energy} rotationIntensity={reducedMotion ? 0 : 0.18 + axes.chaos * 0.45} floatIntensity={reducedMotion ? 0 : 0.35}>
       <group ref={group} position={[1.25 + side * 1.7, 0.08, 0]}>
         <mesh ref={core}>
           <icosahedronGeometry args={[0.82, 5]} />
@@ -35,7 +40,7 @@ function SpiritBody({ axes, side = 0 }: { axes: SpiritAxes; side?: number }) {
             roughness={0.32}
             metalness={0.26}
             distort={0.09 + axes.chaos * 0.3}
-            speed={0.9 + axes.energy * 1.8}
+            speed={reducedMotion ? 0 : 0.9 + axes.energy * 1.8}
             transparent
             opacity={0.86}
           />
@@ -58,6 +63,14 @@ function SpiritBody({ axes, side = 0 }: { axes: SpiritAxes; side?: number }) {
 }
 
 export function SpiritScene({ state }: { state: ChatgeistState }) {
+  const [reducedMotion, setReducedMotion] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReducedMotion(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
   const supportsWebGL = useMemo(() => {
     try {
       const canvas = document.createElement("canvas");
@@ -86,9 +99,9 @@ export function SpiritScene({ state }: { state: ChatgeistState }) {
       <ambientLight intensity={0.24} />
       <pointLight position={[1, 2, 4]} color="#72f7ff" intensity={3.4} />
       <pointLight position={[-4, -2, 2]} color="#a78bfa" intensity={2.6} />
-      <Stars radius={45} depth={30} count={850} factor={2.2} saturation={0.2} fade speed={0.28} />
-      <Sparkles count={70 + Math.round(state.axes.energy * 120)} scale={[8, 4, 3]} size={1.15} speed={0.12 + state.axes.energy * 0.45} color="#72f7ff" opacity={0.36} />
-      {split ? <><SpiritBody axes={state.axes} side={-0.8} /><SpiritBody axes={{ ...state.axes, warmth: 1 - state.axes.warmth }} side={0.8} /></> : <SpiritBody axes={state.axes} />}
+      <Stars radius={45} depth={30} count={850} factor={2.2} saturation={0.2} fade={!reducedMotion} speed={reducedMotion ? 0 : 0.28} />
+      <Sparkles count={70 + Math.round(state.axes.energy * 120)} scale={[8, 4, 3]} size={1.15} speed={reducedMotion ? 0 : 0.12 + state.axes.energy * 0.45} color="#72f7ff" opacity={0.36} />
+      {split ? <><SpiritBody axes={state.axes} side={-0.8} reducedMotion={reducedMotion} /><SpiritBody axes={{ ...state.axes, warmth: 1 - state.axes.warmth }} side={0.8} reducedMotion={reducedMotion} /></> : <SpiritBody axes={state.axes} reducedMotion={reducedMotion} />}
       <EffectComposer multisampling={0}>
         <Bloom luminanceThreshold={0.58} luminanceSmoothing={0.48} intensity={0.78} mipmapBlur />
         <Vignette eskil={false} offset={0.18} darkness={0.62} />

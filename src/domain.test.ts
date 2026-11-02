@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeAxes, localFallback, resolveDecisionChoice, sanitizeChatText, selectVisibleMessages } from "./domain";
+import { computeAxes, deriveFallbackFactions, localFallback, meetsEvidenceThreshold, resolveDecisionChoice, sanitizeChatText, selectVisibleMessages } from "./domain";
 import type { ChatgeistState } from "./types";
 import type { ChatMessage } from "./types";
 
@@ -23,11 +23,16 @@ describe("Chatgeist domain", () => {
     expect(sanitizeChatText("  one   more run  ")).toBe("one more run");
   });
 
+  it("requires five messages from at least three unique community voices", () => {
+    expect(meetsEvidenceThreshold(Array.from({ length: 5 }, (_, index) => ({ ...messages[0], id: String(index) })))).toBe(false);
+    expect(meetsEvidenceThreshold([...messages, { ...messages[0], id: "4" }, { ...messages[1], id: "5" }])).toBe(true);
+  });
+
   it("creates a truthful local fallback", () => {
     const result = localFallback(messages, "What next?");
     expect(result.sourceIds).toEqual(["1", "2", "3"]);
     expect(result.answer).toContain("grounded snapshot");
-    expect(result.split.leftSupportIds.length + result.split.rightSupportIds.length).toBe(3);
+    expect(result.split).toMatchObject({ active: false, leftSupportIds: [], rightSupportIds: [] });
   });
 
   it("caps the visible orbit and prioritizes grounded sources", () => {
@@ -49,8 +54,37 @@ describe("Chatgeist domain", () => {
     } as ChatgeistState;
     expect(resolveDecisionChoice(state, "right")).toEqual({
       title: "One shield",
-      objective: "The community locked “One shield” as the outcome. Put it on stream now and let chat hold the decision.",
+      objective: "The streamer locked “One shield” from the community’s factions. Put it on stream now and let chat hold the decision.",
       selection: "right"
     });
+  });
+
+  it("derives fallback factions only from repeated lexical themes", () => {
+    const themed: ChatMessage[] = [
+      { ...messages[0], id: "a", text: "one life with inverted controls" },
+      { ...messages[1], id: "b", text: "keep one life, chat picks controls" },
+      { ...messages[2], id: "c", text: "give us a mercy shield" },
+      { ...messages[0], id: "d", text: "one mercy shield on impossible mode" }
+    ];
+    const split = deriveFallbackFactions(themed);
+    expect(split.active).toBe(true);
+    expect(split.leftSupportIds).toHaveLength(2);
+    expect(split.rightSupportIds).toHaveLength(2);
+    expect(deriveFallbackFactions(themed.slice(0, 3)).active).toBe(false);
+  });
+
+  it("keeps the shipped simulator's life and mercy themes separate", () => {
+    const simulatorEvidence = [
+      "inverted controls, but keep one life",
+      "no healing, pure chaos",
+      "one life and the room picks the rules",
+      "give the streamer one mercy shield",
+      "impossible mode with one mercy shield",
+      "one more run if we lose"
+    ].map((text, index) => ({ ...messages[index % messages.length], id: `sim-${index}`, userId: `sim-user-${index}`, text }));
+    const split = deriveFallbackFactions(simulatorEvidence);
+    expect(split.active).toBe(true);
+    expect(split.leftSupportIds).toEqual(["sim-0", "sim-2"]);
+    expect(split.rightSupportIds).toEqual(["sim-3", "sim-4"]);
   });
 });

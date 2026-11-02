@@ -21,6 +21,9 @@ export function wrapArtifactText(value: string, limit = 52): string[] {
 export function buildDecisionArtifact(state: ChatgeistState): string {
   if (!state.decision) throw new Error("A locked decision is required to build an artifact.");
   const title = escapeXml(state.decision.title);
+  const signalPhrase = escapeXml(state.memoryPhrase || state.decision.title);
+  const spiritRadius = Math.round(150 + state.axes.energy * 70);
+  const spiritColor = state.axes.warmth >= 0.5 ? "#ff7d73" : "#72f7ff";
   const lines = wrapArtifactText(state.decision.objective).map((line, index) =>
     `<text x="112" y="${350 + index * 58}" class="answer">${escapeXml(line)}</text>`
   ).join("");
@@ -30,22 +33,23 @@ export function buildDecisionArtifact(state: ChatgeistState): string {
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
   <defs>
-    <radialGradient id="spirit" cx="40%" cy="30%"><stop stop-color="#f2c96d"/><stop offset=".36" stop-color="#ff7d73"/><stop offset="1" stop-color="#a78bfa"/></radialGradient>
+    <radialGradient id="spirit" cx="40%" cy="30%"><stop stop-color="#f2c96d"/><stop offset=".36" stop-color="${spiritColor}"/><stop offset="1" stop-color="#a78bfa"/></radialGradient>
     <linearGradient id="signal"><stop stop-color="#a78bfa"/><stop offset="1" stop-color="#72f7ff"/></linearGradient>
   </defs>
   <rect width="1600" height="900" fill="#050815"/>
   <circle cx="1310" cy="420" r="285" fill="none" stroke="#72f7ff" stroke-opacity=".18"/>
-  <circle cx="1310" cy="420" r="208" fill="url(#spirit)" opacity=".82"/>
+  <circle cx="1310" cy="420" r="${spiritRadius}" fill="url(#spirit)" opacity=".82"/>
   <circle cx="1240" cy="395" r="12" fill="#fff6c8"/><circle cx="1375" cy="395" r="12" fill="#fff6c8"/>
   <text x="112" y="105" class="brand">◐ CHATGEIST · COMMUNITY DECISION</text>
   <text x="112" y="180" class="kicker">DECISION LOCKED</text>
   <text x="112" y="270" class="title">${title}</text>
   ${lines}
   <rect x="112" y="690" width="920" height="4" fill="url(#signal)"/>
-  <text x="112" y="730" class="proof">${state.decision.participantCount} VOICES · ${state.decision.sourceCount} GROUNDED SOURCES · ${escapeXml(state.provenance.toUpperCase())}</text>
+  <text x="112" y="730" class="proof">${state.decision.participantCount} VOICES · ${state.decision.sourceCount} GROUNDED SOURCES · ${escapeXml(state.mode.toUpperCase())}${state.provenance === "fallback" ? " · FALLBACK" : ""}</text>
+  <text x="112" y="858" class="memory">SESSION SIGNAL · ${signalPhrase}</text>
   ${sources}
   <style>
-    .brand,.kicker,.proof,.source{font-family:ui-monospace,monospace;letter-spacing:3px}.brand{fill:#f6f2e8;font-size:22px;font-weight:700}.kicker{fill:#72f7ff;font-size:18px}.title{fill:#f6f2e8;font-family:Georgia,serif;font-size:62px}.answer{fill:#f6f2e8;font-family:Georgia,serif;font-size:38px}.proof{fill:#f2c96d;font-size:16px}.source{fill:#98a5bd;font-size:14px;letter-spacing:1px}
+    .brand,.kicker,.proof,.source,.memory{font-family:ui-monospace,monospace;letter-spacing:3px}.brand{fill:#f6f2e8;font-size:22px;font-weight:700}.kicker{fill:#72f7ff;font-size:18px}.title{fill:#f6f2e8;font-family:Georgia,serif;font-size:62px}.answer{fill:#f6f2e8;font-family:Georgia,serif;font-size:38px}.proof{fill:#f2c96d;font-size:16px}.source{fill:#98a5bd;font-size:14px;letter-spacing:1px}.memory{fill:#72f7ff;font-size:13px;letter-spacing:2px}
   </style>
 </svg>`;
 }

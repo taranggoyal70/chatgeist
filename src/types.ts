@@ -1,5 +1,6 @@
 export type SourceMode = "simulator" | "twitch";
 export type Phase = "dormant" | "summoning" | "present" | "collecting" | "grounding" | "answer-ready" | "speaking" | "locked" | "remembered" | "error";
+export type DecisionSelection = "left" | "right" | "recommendation";
 
 export interface ChatMessage {
   id: string;
@@ -28,10 +29,15 @@ export interface SplitState {
 export interface LockedDecision {
   title: string;
   objective: string;
-  selection: "left" | "right" | "recommendation";
+  selection: DecisionSelection;
   lockedAt: number;
   participantCount: number;
   sourceCount: number;
+}
+
+export interface CollectionWindow {
+  startedAt: number;
+  endsAt: number;
 }
 
 export interface ServiceHealth {
@@ -54,8 +60,7 @@ export interface ChatgeistState {
   axes: SpiritAxes;
   split: SplitState;
   participantCount: number;
-  collectionStartedAt: number | null;
-  collectionEndsAt: number | null;
+  collectionWindow: CollectionWindow | null;
   decision: LockedDecision | null;
   statusText: string;
   voiceReady: boolean;
@@ -71,3 +76,5 @@ export const neutralAxes: SpiritAxes = {
   warmth: 0.56,
   chaos: 0.2
 };
+
+export const emptySplitState = (): SplitState => ({ active: false, leftLabel: "", rightLabel: "", leftCount: 0, rightCount: 0 });

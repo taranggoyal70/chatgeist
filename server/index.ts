@@ -5,9 +5,9 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { WebSocket, WebSocketServer } from "ws";
 import { z } from "zod";
-import { computeAxes, localFallback, resolveDecisionChoice, sanitizeChatText } from "../src/domain";
+import { computeAxes, localFallback, meetsEvidenceThreshold, resolveDecisionChoice, sanitizeChatText } from "../src/domain";
 import { buildDecisionArtifact } from "../src/artifact";
-import { neutralAxes, type ChatMessage, type ChatgeistState, type SourceMode } from "../src/types";
+import { emptySplitState, neutralAxes, type ChatMessage, type ChatgeistState, type DecisionSelection, type SourceMode } from "../src/types";
 
 loadEnv({ path: ".env.local", override: false });
 
@@ -19,6 +19,9 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPE
 let latestAudio: Buffer | null = null;
 let activeInteraction = 0;
 let twitchSocket: WebSocket | null = null;
+let lastAcceptedByUser = new Map<string, number>();
+let acceptedTexts = new Set<string>();
+let acceptedMessageIds = new Set<string>();
 
 const GroundedAnswer = z.object({
   answer: z.string().min(1).max(360),
@@ -50,10 +53,9 @@ const initialState = (): ChatgeistState => ({
   messages: [],
   sourceIds: [],
   axes: { ...neutralAxes },
-  split: { active: false, leftLabel: "", rightLabel: "", leftCount: 0, rightCount: 0 },
+  split: emptySplitState(),
   participantCount: 0,
-  collectionStartedAt: null,
-  collectionEndsAt: null,
+  collectionWindow: null,
   decision: null,
   statusText: "Choose an input source, then summon the room.",
   voiceReady: false,
@@ -95,10 +97,24 @@ wss.on("connection", (socket) => {
   });
 });
 
-function ingest(userName: string, userId: string, rawText: string, source: SourceMode) {
+function resetEvidenceGuards() {
+  lastAcceptedByUser = new Map();
+  acceptedTexts = new Set();
+  acceptedMessageIds = new Set();
+}
+
+function ingest(userName: string, userId: string, rawText: string, source: SourceMode, upstreamMessageId?: string) {
+  if (state.phase !== "summoning" && state.phase !== "collecting") return false;
   const text = sanitizeChatText(rawText);
-  if (!text) return;
-  const message: ChatMessage = { id: crypto.randomUUID(), userId, userName: userName.slice(0, 28), text, timestamp: Date.now(), source };
+  if (!text) return false;
+  const now = Date.now();
+  const normalized = text.toLocaleLowerCase();
+  if ((upstreamMessageId && acceptedMessageIds.has(upstreamMessageId)) || acceptedTexts.has(normalized) || now - (lastAcceptedByUser.get(userId) ?? 0) < 5_000) return false;
+  const messageId = upstreamMessageId || crypto.randomUUID();
+  acceptedTexts.add(normalized);
+  acceptedMessageIds.add(messageId);
+  lastAcceptedByUser.set(userId, now);
+  const message: ChatMessage = { id: messageId, userId, userName: userName.slice(0, 28), text, timestamp: now, source };
   const messages = [...state.messages, message].slice(-100);
   update({
     messages,
@@ -106,6 +122,7 @@ function ingest(userName: string, userId: string, rawText: string, source: Sourc
     axes: computeAxes(messages),
     statusText: state.phase === "summoning" ? `${messages.length} signals are shaping the spirit.` : state.statusText
   });
+  return true;
 }
 
 const simulatorSummon = [
@@ -128,15 +145,15 @@ const simulatorAnswers = [
 async function runSummon() {
   activeInteraction += 1;
   latestAudio = null;
+  resetEvidenceGuards();
   update({
     phase: "summoning",
     question: "",
     answer: "",
     sourceIds: [],
-    split: { active: false, leftLabel: "", rightLabel: "", leftCount: 0, rightCount: 0 },
+    split: emptySplitState(),
     participantCount: 0,
-    collectionStartedAt: null,
-    collectionEndsAt: null,
+    collectionWindow: null,
     decision: null,
     voiceReady: false,
     messages: [],
@@ -162,13 +179,14 @@ async function runSummon() {
 
 async function ground(question: string, interactionId: number) {
   if (interactionId !== activeInteraction) return;
-  const evidence = state.messages.slice(-30);
-  if (evidence.length < 3) {
-    update({ phase: "present", answer: "I do not have enough voices yet. Ask the room again or use the simulator.", statusText: "Grounding abstained: too little eligible evidence." });
+  const evidence = state.messages.slice(0, 100);
+  const uniqueParticipants = new Set(evidence.map((message) => message.userId)).size;
+  update({ phase: "grounding", collectionWindow: null, statusText: "Finding the shared signal without hiding disagreement…" });
+  if (!meetsEvidenceThreshold(evidence)) {
+    update({ phase: "present", answer: "I do not have enough voices yet. Ask the room again or use the simulator.", sourceIds: [], split: emptySplitState(), statusText: `Grounding abstained: ${evidence.length}/5 eligible messages from ${uniqueParticipants}/3 unique voices.` });
     return;
   }
 
-  update({ phase: "grounding", statusText: "Finding the shared signal without hiding disagreement…" });
   const fallback = localFallback(evidence, question);
   let result = fallback;
   let provenance: ChatgeistState["provenance"] = state.mode === "twitch" ? "live" : "simulated";
@@ -206,22 +224,23 @@ async function ground(question: string, interactionId: number) {
   }
 
   if (interactionId !== activeInteraction) return;
-  const leftCount = new Set(evidence.filter((message) => result.split.leftSupportIds.includes(message.id)).map((message) => message.userId)).size;
-  const rightCount = new Set(evidence.filter((message) => result.split.rightSupportIds.includes(message.id)).map((message) => message.userId)).size;
+  const leftSupportIds = new Set(result.split.leftSupportIds);
+  const rightSupportIds = new Set(result.split.rightSupportIds.filter((id) => !leftSupportIds.has(id)));
+  const leftCount = new Set(evidence.filter((message) => leftSupportIds.has(message.id)).map((message) => message.userId)).size;
+  const rightCount = new Set(evidence.filter((message) => rightSupportIds.has(message.id)).map((message) => message.userId)).size;
   update({
     phase: "answer-ready",
     answer: result.answer,
     sourceIds: result.sourceIds,
     axes: result.axes,
     split: {
-      active: result.split.active,
+      active: result.split.active && leftCount > 0 && rightCount > 0,
       leftLabel: result.split.leftLabel,
       rightLabel: result.split.rightLabel,
       leftCount,
       rightCount
     },
-    collectionStartedAt: null,
-    collectionEndsAt: null,
+    collectionWindow: null,
     memoryPhrase: result.memoryPhrase,
     provenance,
     statusText: provenance === "fallback" ? "GROUNDED FALLBACK — the API was unavailable, sources remain visible." : "Grounded answer ready. Review sources, then play the AI voice."
@@ -284,6 +303,7 @@ app.post("/api/ask", async (request, reply) => {
   latestAudio = null;
   const collectionMs = state.mode === "twitch" ? TWITCH_COLLECTION_MS : SIMULATOR_COLLECTION_MS;
   const collectionStartedAt = Date.now();
+  resetEvidenceGuards();
   update({
     phase: "collecting",
     question,
@@ -291,10 +311,9 @@ app.post("/api/ask", async (request, reply) => {
     sourceIds: [],
     messages: [],
     participantCount: 0,
-    split: { active: false, leftLabel: "", rightLabel: "", leftCount: 0, rightCount: 0 },
+    split: emptySplitState(),
     decision: null,
-    collectionStartedAt,
-    collectionEndsAt: collectionStartedAt + collectionMs,
+    collectionWindow: { startedAt: collectionStartedAt, endsAt: collectionStartedAt + collectionMs },
     voiceReady: false,
     statusText: state.mode === "twitch" ? "Listening to live Twitch chat for 30 seconds…" : "SIMULATED CHAT — collecting a six-second decision window…"
   });
@@ -312,15 +331,14 @@ app.post("/api/ask", async (request, reply) => {
 });
 
 app.post("/api/message", async (request, reply) => {
-  const body = request.body as { userName?: string; text?: string };
+  const body = request.body as { userName?: string; text?: string; messageId?: string };
   if (!body.userName || !body.text) return reply.code(400).send({ error: "userName and text are required." });
-  ingest(body.userName, body.userName.toLowerCase(), body.text, state.mode);
-  return { ok: true };
+  return { ok: ingest(body.userName, body.userName.toLowerCase(), body.text, state.mode, body.messageId) };
 });
 
 app.post("/api/lock", async (request, reply) => {
   if (state.phase !== "answer-ready" && state.phase !== "speaking") return reply.code(409).send({ error: "Generate a grounded answer before locking the decision." });
-  const body = request.body as { selection?: "left" | "right" | "recommendation" };
+  const body = request.body as { selection?: DecisionSelection };
   const selection = body.selection ?? (state.split.leftCount >= state.split.rightCount ? "left" : "right");
   if (!(["left", "right", "recommendation"] as const).includes(selection)) return reply.code(400).send({ error: "Choose left, right, or recommendation." });
   const resolved = resolveDecisionChoice(state, selection);
@@ -346,6 +364,7 @@ app.post("/api/voice-ended", async () => {
 app.post("/api/reset", async () => {
   activeInteraction += 1;
   latestAudio = null;
+  resetEvidenceGuards();
   const health = state.health;
   const mode = state.mode;
   state = { ...initialState(), health, mode, provenance: mode === "twitch" ? "live" : "simulated" };
@@ -379,7 +398,7 @@ async function connectTwitch() {
       }
       if (data.metadata?.message_type === "notification" && data.metadata?.subscription_type === "channel.chat.message") {
         const event = data.payload.event;
-        ingest(event.chatter_user_name, event.chatter_user_id, event.message.text, "twitch");
+        ingest(event.chatter_user_name, event.chatter_user_id, event.message.text, "twitch", event.message_id);
       }
       if (data.metadata?.message_type === "session_reconnect" && data.payload?.session?.reconnect_url) {
         twitchSocket?.close();
