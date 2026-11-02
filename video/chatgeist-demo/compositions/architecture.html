@@ -1,0 +1,31 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; background: #f6f2e8; color: #050815; font-family: Outfit, sans-serif; }
+    #arch-title { position: absolute; left: 90px; top: 86px; font: 400 82px/1 "EB Garamond", serif; letter-spacing: -.04em; }
+    #arch-flow { position: absolute; left: 90px; right: 90px; top: 310px; display: grid; grid-template-columns: 1fr 80px 1fr 80px 1fr 80px 1fr; align-items: center; }
+    .node { height: 220px; border-top: 7px solid #050815; padding-top: 22px; }
+    .node b { display: block; font-size: 42px; } .node span { display: block; margin-top: 15px; font: 400 28px/1.4 IBM Plex Mono, monospace; }
+    .arrow { text-align: center; font-size: 54px; color: #5c35be; }
+    #arch-codex { position: absolute; left: 90px; right: 90px; bottom: 90px; display: flex; justify-content: space-between; align-items: center; padding-top: 22px; border-top: 2px solid #050815; font: 700 28px/1 IBM Plex Mono, monospace; }
+    #arch-codex strong { color: #5c35be; }
+  </style>
+  <div data-hf-id="hf-37to" id="root" data-composition-id="architecture" data-width="1920" data-height="1080">
+    <h1 data-hf-id="hf-9kmc" id="arch-title" class="clip" data-start="0" data-duration="6.4">One room. One grounded voice.</h1>
+    <div data-hf-id="hf-92wt" id="arch-flow" class="clip" data-start="0" data-duration="6.4">
+      <div data-hf-id="hf-cdek" class="node"><b data-hf-id="hf-dmx6">Twitch</b><span data-hf-id="hf-2wkn">EventSub chat<br data-hf-id="hf-x5px" />or labeled simulator</span></div><div data-hf-id="hf-drib" class="arrow">→</div>
+      <div data-hf-id="hf-7gt0" class="node"><b data-hf-id="hf-v2y3">Bound</b><span data-hf-id="hf-yhol">Eligible evidence<br data-hf-id="hf-rsrt" />active window only</span></div><div data-hf-id="hf-yhhf" class="arrow">→</div>
+      <div data-hf-id="hf-69vx" class="node"><b data-hf-id="hf-4pz2">Ground</b><span data-hf-id="hf-78cm">Structured Output<br data-hf-id="hf-szow" />source IDs validated</span></div><div data-hf-id="hf-y36e" class="arrow">→</div>
+      <div data-hf-id="hf-6o6y" class="node"><b data-hf-id="hf-l0hb">Embody</b><span data-hf-id="hf-0rpk">Procedural 3D<br data-hf-id="hf-sldv" />captioned AI voice</span></div>
+    </div>
+    <div data-hf-id="hf-iwi4" id="arch-codex" class="clip" data-start=".2" data-duration="6.2"><span data-hf-id="hf-lad4"><strong data-hf-id="hf-26kt">CODEX</strong> designed · implemented · tested · visually inspected</span><span data-hf-id="hf-csdv">3 tests passing · strict TypeScript · production build</span></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#arch-title", { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: .42, ease: "power4.out" }, .05);
+    tl.fromTo(".node", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: .4, stagger: .34, ease: "power3.out" }, .4);
+    tl.fromTo(".arrow", { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, duration: .3, stagger: .34, ease: "back.out(1.5)" }, .72);
+    tl.fromTo("#arch-codex", { opacity: 0 }, { opacity: 1, duration: .45 }, 2.15);
+    tl.to(".arrow", { color: "#ff7d73", duration: .3, stagger: .08, yoyo: true, repeat: 1, ease: "power2.inOut" }, 4.15);
+    window.__timelines.architecture = tl;
+  </script>
+</template>

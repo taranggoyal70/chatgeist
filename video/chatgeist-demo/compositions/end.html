@@ -1,0 +1,23 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; background: #f6f2e8; color: #050815; font-family: Outfit, sans-serif; display: grid; place-items: center; }
+    #end-mark { position: absolute; top: 150px; width: 156px; height: 156px; border-radius: 50%; border: 5px solid #050815; display: grid; place-items: center; font-size: 80px; color: #5c35be; }
+    #end-name { position: relative; margin-top: 42px; font: 700 158px/1 Outfit, sans-serif; letter-spacing: .12em; }
+    #end-tag { position: absolute; top: 640px; font: 400 58px/1.15 "EB Garamond", serif; }
+    #end-url { position: absolute; bottom: 82px; color: #5c35be; font: 700 40px/1 IBM Plex Mono, monospace; letter-spacing: .04em; }
+  </style>
+  <div data-hf-id="hf-gwfo" id="root" data-composition-id="end" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-pypl" id="end-mark" class="clip" data-start="0" data-duration="4">◐</div>
+    <div data-hf-id="hf-vuet" id="end-name" class="clip" data-start="0" data-duration="4">CHATGEIST</div>
+    <div data-hf-id="hf-x468" id="end-tag" class="clip" data-start=".1" data-duration="3.9">Summon your community. Speak to its soul.</div>
+    <div data-hf-id="hf-oyue" id="end-url" class="clip" data-start=".2" data-duration="3.8" data-var-text="repoUrl">github.com/taranggoyal70/chatgeist</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#end-mark", { scale: .3, rotate: -120, opacity: 0 }, { scale: 1, rotate: 0, opacity: 1, duration: .62, ease: "back.out(1.7)" }, .05);
+    tl.fromTo("#end-name", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: .65, ease: "power4.out" }, .42);
+    tl.fromTo("#end-tag", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: .4 }, .82);
+    tl.fromTo("#end-url", { opacity: 0 }, { opacity: 1, duration: .4 }, 1.1);
+    window.__timelines.end = tl;
+  </script>
+</template>

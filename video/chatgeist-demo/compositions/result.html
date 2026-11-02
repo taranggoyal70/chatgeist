@@ -1,0 +1,25 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; background: #050815; font-family: Outfit, sans-serif; }
+    #result-shot { position: absolute; inset: -2%; width: 104%; height: 104%; object-fit: cover; }
+    #result-scrim { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(5,8,21,.02), transparent 60%, rgba(5,8,21,.32)); }
+    #result-line { position: absolute; left: 76px; top: 74px; height: 3px; width: 620px; background: #72f7ff; transform-origin: left; }
+    #result-label { position: absolute; left: 78px; top: 92px; color: #72f7ff; font: 700 30px/1 IBM Plex Mono, monospace; letter-spacing: .14em; text-transform: uppercase; }
+    #result-copy { position: absolute; right: 78px; bottom: 70px; color: #f6f2e8; font: 700 46px/1.08 Outfit, sans-serif; text-align: right; max-width: 650px; }
+  </style>
+  <div data-hf-id="hf-6xgm" id="root" data-composition-id="result" data-width="1920" data-height="1080">
+    <img data-hf-id="hf-z545" id="result-shot" class="clip" data-layout-allow-overflow data-start="0" data-duration="4" src="assets/overlay-answer.png" alt="Verified Chatgeist grounded answer and faction split" />
+    <div data-hf-id="hf-ok3y" id="result-scrim" class="clip" data-start="0" data-duration="4"></div>
+    <div data-hf-id="hf-3zka" id="result-line" class="clip" data-start="0" data-duration="4"></div>
+    <div data-hf-id="hf-de53" id="result-label" class="clip" data-start="0" data-duration="4">A room divided becomes visible</div>
+    <div data-hf-id="hf-7gor" id="result-copy" class="clip" data-start=".35" data-duration="3.65">The answer keeps<br data-hf-id="hf-x5px" />the people behind it.</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#result-shot", { scale: 1.02 }, { scale: 1.08, duration: 3.95, ease: "power1.inOut" }, 0);
+    tl.fromTo("#result-line", { scaleX: 0 }, { scaleX: 1, duration: .42, ease: "power4.out" }, .05);
+    tl.fromTo("#result-label", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: .35, ease: "power3.out" }, .18);
+    tl.fromTo("#result-copy", { opacity: 0, x: 34 }, { opacity: 1, x: 0, duration: .46, ease: "power4.out" }, .42);
+    window.__timelines.result = tl;
+  </script>
+</template>

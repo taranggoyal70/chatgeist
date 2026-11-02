@@ -1,0 +1,22 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; background: #050815; color: #f6f2e8; font-family: Outfit, sans-serif; display: grid; place-items: center; }
+    #claim-ring { position: absolute; width: 820px; height: 820px; border-radius: 50%; border: 3px solid rgba(114,247,255,.34); box-shadow: 0 0 0 120px rgba(167,139,250,.04), 0 0 90px rgba(114,247,255,.12); }
+    #claim-text { position: relative; width: 1420px; text-align: center; font: 400 132px/.9 "EB Garamond", serif; letter-spacing: -.055em; }
+    #claim-text em { color: #f2c96d; font-style: normal; }
+    #claim-sub { position: absolute; bottom: 104px; font: 700 30px/1 IBM Plex Mono, monospace; letter-spacing: .12em; color: #72f7ff; text-transform: uppercase; }
+  </style>
+  <div data-hf-id="hf-dc55" id="root" data-composition-id="claim" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-e7vg" id="claim-ring" class="clip" data-start="0" data-duration="5"></div>
+    <div data-hf-id="hf-m8wt" id="claim-text" class="clip" data-start="0" data-duration="5">We turn Twitch chat into<br data-hf-id="hf-x5px" />a living <em data-hf-id="hf-9ntv">3D co-host.</em></div>
+    <div data-hf-id="hf-dizq" id="claim-sub" class="clip" data-start=".3" data-duration="4.7">Grounded · visible · streamer controlled</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#claim-ring", { scale: .72, opacity: 0 }, { scale: 1, opacity: 1, duration: .8, ease: "power3.out" }, .05);
+    tl.fromTo("#claim-text", { opacity: 0, y: 44 }, { opacity: 1, y: 0, duration: .58, ease: "power4.out" }, .18);
+    tl.fromTo("#claim-sub", { opacity: 0 }, { opacity: 1, duration: .4 }, .72);
+    tl.to("#claim-ring", { scale: 1.045, opacity: .82, duration: .5, yoyo: true, repeat: 1, ease: "sine.inOut" }, 3.15);
+    window.__timelines.claim = tl;
+  </script>
+</template>

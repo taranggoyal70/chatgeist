@@ -7,4 +7,6 @@ test-results/
 playwright-report/
 docs/designs/*.review.*/
 docs/hackathon-build/
+video/chatgeist-demo/.hyperframes/
+video/chatgeist-demo/renders/
 .DS_Store

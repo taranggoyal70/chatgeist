@@ -1,0 +1,25 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; background: #f6f2e8; color: #050815; font-family: Outfit, sans-serif; }
+    #tension-title { position: absolute; left: 90px; top: 290px; width: 1080px; font: 400 138px/.88 "EB Garamond", serif; letter-spacing: -.05em; }
+    #tension-accent { color: #5c35be; }
+    .msg { position: absolute; padding: 14px 20px; border: 2px solid #050815; background: #f6f2e8; font: 700 30px/1.1 IBM Plex Mono, monospace; }
+    #m1 { right: 100px; top: 130px; } #m2 { right: 270px; top: 300px; } #m3 { right: 90px; top: 480px; } #m4 { right: 220px; top: 675px; }
+    #tension-rule { position: absolute; left: 90px; bottom: 100px; width: 540px; height: 8px; background: #ff7d73; transform-origin: left; }
+  </style>
+  <div data-hf-id="hf-3y5z" id="root" data-composition-id="tension" data-width="1920" data-height="1080">
+    <h1 data-hf-id="hf-h4hh" id="tension-title" class="clip" data-start="0" data-duration="4">When chat moves fast,<br data-hf-id="hf-x5px" /><span data-hf-id="hf-luj9" id="tension-accent">the room disappears.</span></h1>
+    <div data-hf-id="hf-3g9i" id="m1" class="clip msg" data-start="0" data-duration="4">NO HEALING</div>
+    <div data-hf-id="hf-aiw8" id="m2" class="clip msg" data-start="0" data-duration="4">ONE MORE RUN</div>
+    <div data-hf-id="hf-hja8" id="m3" class="clip msg" data-start="0" data-duration="4">KEEP THE SHIELD</div>
+    <div data-hf-id="hf-zx2a" id="m4" class="clip msg" data-start="0" data-duration="4">IMPOSSIBLE MODE</div>
+    <div data-hf-id="hf-k2dl" id="tension-rule" class="clip" data-start="0" data-duration="4"></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#tension-title", { opacity: 0, x: -48 }, { opacity: 1, x: 0, duration: .46, ease: "power4.out" }, .05);
+    ["#m1", "#m2", "#m3", "#m4"].forEach((id, i) => tl.fromTo(id, { x: 500, rotate: i % 2 ? 4 : -3 }, { x: 0, rotate: 0, duration: .42, ease: "power3.out" }, .15 + i * .26));
+    tl.fromTo("#tension-rule", { scaleX: 0 }, { scaleX: 1, duration: .6, ease: "power4.out" }, .2);
+    window.__timelines.tension = tl;
+  </script>
+</template>
