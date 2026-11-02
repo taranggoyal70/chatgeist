@@ -8,5 +8,7 @@ playwright-report/
 docs/designs/*.review.*/
 docs/hackathon-build/
 video/chatgeist-demo/.hyperframes/
+video/chatgeist-demo/.thumbnails/
+video/chatgeist-demo/.waveform-cache/
 video/chatgeist-demo/renders/
 .DS_Store

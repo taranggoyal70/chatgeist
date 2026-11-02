@@ -1,97 +1,107 @@
-# Chatgeist
+# Title
 
-**Tagline:** Turn Twitch chat into a living 3D co-host.
+Chatgeist
 
-## Inspiration
+## One-line Summary
 
-Twitch chat is a community until it becomes too fast to understand. Streamers can read individual messages, run polls, or add fixed alerts, but they cannot ask the whole room a question and hear a grounded answer without losing the people and disagreement behind it.
+Turn Twitch chat into a living 3D community co-host.
 
-We wanted to make the community itself visible.
+## Problem
 
-## What it does
+Twitch chat is the emotional center of a stream, but its best moments disappear inside a fast-moving wall of messages. Polls reduce a community to percentages, and generic AI chatbots flatten thousands of distinct voices into one untraceable answer. Streamers need a way to make the room's collective mood, disagreement, and creativity visible without surrendering trust or control.
 
-Chatgeist turns eligible Twitch chat into a procedural 3D spirit. Messages shape four visible dimensions—energy, consensus, warmth, and chaos. The streamer asks a question from a private control room, and Chatgeist considers a bounded evidence window before returning a concise answer with the exact representative source messages that shaped it.
+## Solution
 
-When the room disagrees, Chatgeist does not flatten it into fake consensus. The spirit physically splits into two grounded factions. The streamer can then play an AI-generated community voice while the answer remains captioned and the source messages stay visible.
+Chatgeist transforms eligible Twitch chat into a living procedural 3D spirit. Its shape, color, energy, and two orbiting factions respond to the room in real time. When the streamer summons it, Chatgeist answers as a voice co-host using only the visible messages and stream context in its grounding window. The control room shows which messages shaped the answer, while a broadcast-safe overlay turns that state into a dramatic audience moment.
 
-The project includes:
+The result is not another chatbot. It is a new character jointly performed by the streamer and their community.
 
-- Twitch EventSub chat ingestion
-- a deterministic simulator using the same normalized input path
-- Structured Outputs with source-ID validation
-- AI-generated speech with visible disclosure
-- an original procedural 3D spirit and CSS fallback
-- separate private control and broadcast overlay surfaces
-- explicit live, simulator, and fallback provenance
-- streamer-owned playback and clear-session controls
+## Why This Matters
 
-## How we built it
+Chatgeist gives viewers an immediate sense that their participation changes the show. It gives streamers a repeatable ritual for decisions, debates, predictions, recaps, and community storytelling. Most importantly, it keeps AI accountable: the audience can see whether an answer came from chat, the stream context, or the system fallback.
 
-The frontend uses React, TypeScript, Vite, React Three Fiber, Drei, Three.js, and postprocessing. A Fastify server owns the authoritative session state and broadcasts redacted snapshots through WebSockets.
+## How We Used AI
 
-Twitch EventSub subscribes to `channel.chat.message`. Simulator events use the same `ChatMessage` contract, so the UI and grounding pipeline cannot silently diverge.
+Chatgeist uses OpenAI Structured Outputs to convert a bounded window of eligible chat into a grounded response, representative source IDs, a confidence value, and visual mood axes. Those mood axes drive the spirit's procedural form, while OpenAI text-to-speech gives the summoned answer a distinctive voice. If an AI request is unavailable, Chatgeist falls back deterministically and labels the provenance instead of inventing a successful state.
 
-For every question, the server sends only the active eligible evidence window to the OpenAI Responses API. A strict Zod schema requires:
+## How We Used Codex
 
-- the grounded answer;
-- three to five source message IDs;
-- visual mood axes;
-- a bounded faction split;
-- a short memory phrase.
+Codex was our end-to-end build partner. We used it to study the hackathon requirements, challenge and refine the product concept, design the interaction and visual system, implement the Twitch EventSub adapter, build the Fastify/WebSocket backend and React/Three.js interfaces, add grounded Structured Output and voice generation, write tests, run TypeScript and production-build checks, perform browser QA, create the public documentation, and author the HyperFrames launch film.
 
-Every returned source ID must exist in the active window. If the API fails or the response cannot be trusted, Chatgeist uses an explicitly labeled local fallback. OpenAI's speech endpoint produces the community voice, while the exact answer remains visible as text.
+The primary Codex session ID is `01a183dc-c058-70b1-8cf6-3f99cc1b1cc7` (pending participant confirmation before submission).
 
-## How we used Codex
+## Key Features
 
-Codex was our primary product and engineering collaborator. We used it to:
+- Living procedural 3D community spirit whose form reflects chat mood and energy
+- Two visible opinion factions instead of a misleading single consensus
+- Grounded answers with representative Twitch-message evidence and source provenance
+- Separate streamer control room and broadcast-safe overlay
+- OpenAI voice co-host with a deterministic text fallback
+- Real Twitch EventSub WebSocket adapter plus a clearly labeled simulator for local testing
+- Privacy-minded ingestion that stores only the bounded data needed for the current ritual
+- WebGL fallback so the demo remains legible on unsupported devices
 
-- inspect the official rules, deadlines, and judging criteria;
-- research Twitch's current EventSub and chat authentication contracts;
-- challenge an earlier AI-minigame direction that was reliable but not memorable;
-- study repeatable patterns from highly successful hackathon projects without copying their work;
-- write and adversarially review the product design;
-- implement the state, grounding, voice, Twitch adapter, simulator, 3D experience, WebGL fallback, tests, and documentation;
-- run strict TypeScript, production builds, browser console checks, and visual screenshot review.
+## Architecture
 
-The final submission includes the Codex session ID for this build thread.
+Twitch EventSub chat messages enter a Fastify server through a normalized adapter. The same contract powers the deterministic simulator used for local development. The server maintains a bounded session state and broadcasts updates over WebSocket to the React control room and overlay. A summon request sends only eligible, visible messages and stream context to OpenAI Structured Outputs. The validated result includes the response, representative message IDs, confidence, faction balance, and visual axes. The client then animates the Three.js spirit and plays the generated voice response.
 
-## Challenges we ran into
+## Testing Instructions
 
-### Designing for disagreement
+1. Clone the public repository.
+2. Run `npm install`.
+3. Copy `.env.example` to `.env.local` and add an OpenAI API key for grounded answers and voice.
+4. Run `npm run dev`.
+5. Open `http://localhost:4173/control` for the streamer control room.
+6. Open `http://localhost:4173/overlay` for the broadcast overlay.
+7. Use the simulator to verify the complete ritual without credentials, or configure the documented Twitch environment variables to connect a real channel.
+8. Run `npm run verify` to execute tests, strict TypeScript checking, and a production build.
 
-A normal summarizer wants to collapse chat into one answer. That would misrepresent the room. We made disagreement a first-class visual state: low consensus can split the spirit into two factions, each backed by visible messages.
+## Public Demo Link
 
-### Preserving truth during failure
+The app is currently demonstrated locally at `http://localhost:4173/control` and `http://localhost:4173/overlay`. A public hosted demo is not required by the hackathon and is not yet provided.
 
-The demo cannot depend on perfect GPU, Twitch, or model behavior. Chatgeist labels simulator and fallback states, keeps captions visible, and degrades from WebGL to a CSS procedural spirit instead of crashing.
+## Public Repository Link
 
-### Making the interface part of the product
+https://github.com/taranggoyal70/chatgeist
 
-We rejected a generic dashboard. The public surface is a stellar signal observatory where chat fragments physically assemble the community. Operational controls remain on a separate private surface.
+## Demo Video
 
-## Accomplishments that we're proud of
+Provisional local render: `video/chatgeist-demo/renders/chatgeist-demo_2026-11-02_09-55-56.mp4`
 
-- A complete simulator-to-grounded-answer-to-voice loop runs today.
-- Structured OpenAI output returns real source-backed factions and visual axes.
-- The AI-generated community voice is playable and remains captioned.
-- The interface survives a forced WebGL failure without losing product state.
-- Tests, strict TypeScript, and production bundling pass.
-- The product can be explained in one sentence: **we turn Twitch chat into a living 3D co-host.**
+This render is intentionally marked provisional because its simulator shot must be replaced with a visible real-Twitch capture before upload. The final public video URL is still required.
 
-## What we learned
+## Screenshot Shot List
 
-The highest-leverage decision was not technical. We stopped before implementation because the first idea was polished but familiar. Codex helped us replace it with a product where Twitch, voice, grounding, and 3D are one interaction rather than sponsor integrations placed side by side.
+1. Control room in ready state with source provenance visible
+2. Summoning ritual with the spirit reacting to chat
+3. Grounded answer with representative messages and confidence
+4. Broadcast overlay with the final voice co-host moment
+5. Brief Codex evidence and public repository proof
 
-We also learned that provenance can be a design material. The source messages do not live in a debug panel; they orbit the entity and become part of the show.
+## Submission Readiness Notes
 
-## What's next
+- Public repository is available and contains all source code, assets, setup instructions, and tests.
+- The project title, tagline, description, technology list, repository link, and thumbnail are saved on Devpost.
+- The app has passed unit tests, strict TypeScript checking, production build, and browser QA.
+- The provisional HyperFrames film passes its technical and accessibility checks.
+- The Devpost project is **not submitted**. `submitted_at` is null.
 
-- Persistent opt-in community memories across streams
-- channel-specific visual DNA and emote-derived materials
-- raid fusion between two community spirits
-- richer accessibility and streamer moderation controls
-- downloadable Memory Seal clips in addition to still images
+## Known Limitations
 
-## Built with
+- A real Twitch developer application, user token, and channel capture are still required for the final eligibility video.
+- The checked-in simulator is for development and judging reproducibility; it must not be presented as the required real-Twitch proof.
+- The Three.js experience uses a CSS visual fallback when WebGL is unavailable.
+- The final public video URL has not been added to Devpost.
 
-React, TypeScript, Vite, React Three Fiber, Drei, Three.js, postprocessing, Fastify, WebSockets, Zod, Vitest, OpenAI Responses API, OpenAI Audio Speech API, Twitch EventSub, Codex
+## TODO Official Form Fields
+
+- Confirm submitter type: Individual or Team of Individuals
+- Confirm country
+- Confirm the Codex session ID above
+- Choose Codex learning impact (recommended: Significantly)
+- Choose likelihood of using Codex again (recommended: Very likely)
+- Confirm age-of-majority eligibility
+- Confirm eligible jurisdiction
+- Confirm participant is not an employee or agent of the organizers/sponsors
+- Record and upload the final video showing Chatgeist working with real Twitch
+- Add the final video URL and perform the final readiness review before explicit submission approval
