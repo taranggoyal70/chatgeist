@@ -69,9 +69,9 @@ https://github.com/taranggoyal70/chatgeist
 
 ## Demo Video
 
-Provisional local render: `video/chatgeist-demo/renders/chatgeist-demo_2026-11-02_09-55-56.mp4`
+Unlisted YouTube demo: https://youtu.be/977clRaoDzw
 
-This render is intentionally marked provisional because its simulator shot must be replaced with a visible real-Twitch capture before upload. The final public video URL is still required.
+The 72-second delivery film opens with verified real Twitch EventSub ingestion, then uses a permanently labeled simulator for the complete multi-viewer decision ritual. It includes AI narration, Chatgeist's disclosed product voice, grounded factions, explicit streamer locking, Codex implementation evidence, and the public repository. YouTube reports no copyright or Community Guidelines issues.
 
 ## Screenshot Shot List
 
@@ -90,15 +90,15 @@ This render is intentionally marked provisional because its simulator shot must 
 - The project title, tagline, description, technology list, repository link, and thumbnail are saved on Devpost.
 - The app has passed unit tests, strict TypeScript checking, production build, and browser QA.
 - Twitch public-client device authorization, token validation, EventSub subscription, and real chat ingestion are verified end to end.
-- The provisional HyperFrames film passes its technical and accessibility checks.
+- The final HyperFrames film passes its technical, layout, contrast, craft, and audio checks and is uploaded to YouTube.
 - The Devpost project is **not submitted**. `submitted_at` is null.
 
 ## Known Limitations
 
-- A real Twitch developer application, user token, and channel capture are still required for the final eligibility video.
+- The live proof uses one authenticated Twitch account; the labeled simulator demonstrates the multi-viewer ritual because no additional real chatters were available.
 - The checked-in simulator is for development and judging reproducibility; it must not be presented as the required real-Twitch proof.
 - The Three.js experience uses a CSS visual fallback when WebGL is unavailable.
-- The final public video URL has not been added to Devpost.
+- The YouTube video is Unlisted and available to judges with the link.
 
 ## TODO Official Form Fields
 
