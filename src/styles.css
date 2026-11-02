@@ -38,7 +38,7 @@ button:disabled { opacity: .38; cursor: not-allowed; }
 .fallback-spirit i:last-child { right: 31%; }
 .spirit-fallback.is-split { grid-template-columns: 1fr 1fr; padding-inline: 24%; }
 .spirit-fallback.is-split .fallback-spirit { width: clamp(110px, 12vw, 190px); }
-.graphics-fallback-label { position: absolute; top: 88px; right: 40px; color: var(--muted); font: 10px ui-monospace, monospace; letter-spacing: .08em; }
+.graphics-fallback-label { position: absolute; top: 88px; right: 40px; color: var(--muted); font: 11px ui-monospace, monospace; letter-spacing: .08em; }
 @keyframes fallback-spin { to { transform: rotate(360deg); } }
 @keyframes fallback-breathe { 50% { scale: 1.06; filter: brightness(1.15); } }
 .observatory::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(5,8,21,.26), transparent 28%, transparent 72%, rgba(5,8,21,.82)), radial-gradient(circle at 50% 50%, transparent 0 34%, rgba(5,8,21,.42) 74%); z-index: 2; }
@@ -65,7 +65,7 @@ button:disabled { opacity: .38; cursor: not-allowed; }
 .message-orbit { position: absolute; inset: 0; pointer-events: none; }
 .message-fragment { position: absolute; width: min(270px, 24vw); padding: 11px 13px; border: 1px solid rgba(152,165,189,.25); background: rgba(5,8,21,.54); backdrop-filter: blur(12px); box-shadow: 0 12px 32px rgba(0,0,0,.25); }
 .message-fragment span { color: var(--gold); font: 11px/1.2 ui-monospace, monospace; letter-spacing: .1em; text-transform: uppercase; }
-.source-badge { float: right; color: var(--cyan); font: 10px/1.2 ui-monospace, monospace; font-style: normal; letter-spacing: .08em; text-transform: uppercase; }
+.source-badge { float: right; color: var(--cyan); font: 11px/1.2 ui-monospace, monospace; font-style: normal; letter-spacing: .08em; text-transform: uppercase; }
 .message-fragment p { margin: 5px 0 0; font-size: 13px; line-height: 1.35; color: rgba(246,242,232,.88); }
 .message-fragment.is-source { border-color: rgba(114,247,255,.65); box-shadow: 0 0 28px rgba(114,247,255,.12); }
 .fragment-1 { left: 4vw; top: 18vh; transform: rotate(-1.2deg); }
@@ -76,7 +76,7 @@ button:disabled { opacity: .38; cursor: not-allowed; }
 
 .faction-key { position: absolute; left: 50%; bottom: 23vh; transform: translateX(-50%); display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; text-align: center; width: min(650px, 70vw); font-size: 12px; letter-spacing: .09em; text-transform: uppercase; }
 .faction-key span { padding: 8px 10px; border-bottom: 1px solid rgba(114,247,255,.45); }
-.faction-key i { color: var(--muted); font-style: normal; font-size: 10px; }
+.faction-key i { color: var(--muted); font-style: normal; font-size: 11px; }
 [data-phase="answer-ready"] .fragment-3,
 [data-phase="speaking"] .fragment-3 { right: 4vw; bottom: 25vh; }
 [data-phase="answer-ready"] .fragment-4,
@@ -86,7 +86,7 @@ button:disabled { opacity: .38; cursor: not-allowed; }
 [data-phase="answer-ready"] .fragment-2,
 [data-phase="speaking"] .fragment-2 { top: 9vh; }
 [data-phase="answer-ready"] .faction-key,
-[data-phase="speaking"] .faction-key { bottom: 14vh; width: min(540px, 46vw); font-size: 10px; }
+[data-phase="speaking"] .faction-key { bottom: 14vh; width: min(540px, 46vw); font-size: 11px; }
 
 .signal-footer { display: grid; grid-template-columns: repeat(4, minmax(100px, 160px)) 1fr; gap: 14px; align-items: end; }
 .signal-footer > p { margin: 0; justify-self: end; color: var(--muted); font: 11px/1.4 ui-monospace, monospace; text-align: right; max-width: 340px; }
@@ -103,7 +103,7 @@ button:disabled { opacity: .38; cursor: not-allowed; }
 .control-panel > header small { color: var(--muted); font: 10px ui-monospace, monospace; text-transform: uppercase; letter-spacing: .1em; }
 .health-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin: 18px 0; }
 .health-grid div { border: 1px solid rgba(152,165,189,.16); padding: 10px; display: grid; gap: 4px; background: rgba(255,255,255,.02); }
-.health-grid span { font: 9px ui-monospace, monospace; text-transform: uppercase; color: var(--muted); letter-spacing: .1em; }
+.health-grid span { font: 11px ui-monospace, monospace; text-transform: uppercase; color: var(--muted); letter-spacing: .08em; }
 .health-grid strong { font-size: 12px; color: var(--cyan); }
 .control-section { padding: 18px 0; border-top: 1px solid rgba(152,165,189,.16); display: grid; gap: 12px; }
 .control-section label { font-size: 13px; color: var(--paper); }
