@@ -1,4 +1,4 @@
-import type { ChatMessage, SpiritAxes } from "./types";
+import type { ChatMessage, Phase, SpiritAxes } from "./types";
 
 const warmWords = new Set(["love", "great", "yes", "kind", "beautiful", "together", "we", "win", "good", "please", "heart", "gg"]);
 const chaoticWords = new Set(["chaos", "wild", "random", "crazy", "impossible", "no", "never", "fight", "versus", "vs"]);
@@ -29,6 +29,12 @@ export function sanitizeChatText(text: string): string | null {
   const clean = text.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim();
   if (!clean || clean.length > 180 || /https?:\/\//i.test(clean)) return null;
   return clean;
+}
+
+export function selectVisibleMessages(messages: ChatMessage[], sourceIds: string[], phase: Phase): ChatMessage[] {
+  const sources = messages.filter((message) => sourceIds.includes(message.id)).slice(-5);
+  if (phase === "collecting") return messages.slice(-5);
+  return sources.length ? sources : messages.slice(-5);
 }
 
 export function localFallback(messages: ChatMessage[], question: string) {

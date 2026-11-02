@@ -65,6 +65,7 @@ button:disabled { opacity: .38; cursor: not-allowed; }
 .message-orbit { position: absolute; inset: 0; pointer-events: none; }
 .message-fragment { position: absolute; width: min(270px, 24vw); padding: 11px 13px; border: 1px solid rgba(152,165,189,.25); background: rgba(5,8,21,.54); backdrop-filter: blur(12px); box-shadow: 0 12px 32px rgba(0,0,0,.25); }
 .message-fragment span { color: var(--gold); font: 11px/1.2 ui-monospace, monospace; letter-spacing: .1em; text-transform: uppercase; }
+.source-badge { float: right; color: var(--cyan); font: 10px/1.2 ui-monospace, monospace; font-style: normal; letter-spacing: .08em; text-transform: uppercase; }
 .message-fragment p { margin: 5px 0 0; font-size: 13px; line-height: 1.35; color: rgba(246,242,232,.88); }
 .message-fragment.is-source { border-color: rgba(114,247,255,.65); box-shadow: 0 0 28px rgba(114,247,255,.12); }
 .fragment-1 { left: 4vw; top: 18vh; transform: rotate(-1.2deg); }
