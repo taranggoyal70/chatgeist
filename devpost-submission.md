@@ -12,7 +12,7 @@ Twitch chat is the emotional center of a stream, but its best moments disappear 
 
 ## Solution
 
-Chatgeist transforms eligible Twitch chat into a living procedural 3D spirit. Its shape, color, energy, and two orbiting factions respond to the room in real time. When the streamer summons it, Chatgeist answers as a voice co-host using only the visible messages and stream context in its grounding window. The control room shows which messages shaped the answer, while a broadcast-safe overlay turns that state into a dramatic audience moment.
+Chatgeist transforms eligible Twitch chat into a living procedural 3D decision co-host. Its shape, color, energy, and two visible factions respond to the room in real time. A streamer opens a timed evidence window; Chatgeist answers using only those post-question messages, shows which voices shaped each faction, and lets the streamer lock one outcome into the show. The broadcast overlay becomes a dramatic community ritual, and the final decision exports as a shareable card.
 
 The result is not another chatbot. It is a new character jointly performed by the streamer and their community.
 
@@ -33,8 +33,11 @@ The primary Codex session ID is `01a183dc-c058-70b1-8cf6-3f99cc1b1cc7` (pending 
 ## Key Features
 
 - Living procedural 3D community spirit whose form reflects chat mood and energy
-- Two visible opinion factions instead of a misleading single consensus
+- Timed decision windows with live participation proof
+- Two visible opinion factions with unique-support counts instead of a misleading single consensus
 - Grounded answers with representative Twitch-message evidence and source provenance
+- Explicit faction locking that turns discussion into an on-stream objective
+- Downloadable 1600×900 decision artifact with sources and provenance
 - Separate streamer control room and broadcast-safe overlay
 - OpenAI voice co-host with a deterministic text fallback
 - Real Twitch EventSub WebSocket adapter plus a clearly labeled simulator for local testing
@@ -43,7 +46,7 @@ The primary Codex session ID is `01a183dc-c058-70b1-8cf6-3f99cc1b1cc7` (pending 
 
 ## Architecture
 
-Twitch EventSub chat messages enter a Fastify server through a normalized adapter. The same contract powers the deterministic simulator used for local development. The server maintains a bounded session state and broadcasts updates over WebSocket to the React control room and overlay. A summon request sends only eligible, visible messages and stream context to OpenAI Structured Outputs. The validated result includes the response, representative message IDs, confidence, faction balance, and visual axes. The client then animates the Three.js spirit and plays the generated voice response.
+Twitch EventSub chat messages enter a Fastify server through a normalized adapter. The same contract powers the deterministic simulator used for local development. Each question clears the summoning messages and opens a fresh bounded evidence window. The server broadcasts the countdown, participant count, visual axes, and normalized messages over WebSocket. OpenAI Structured Outputs returns the grounded response, representative message IDs, two optional faction labels, and faction-support IDs; every ID is validated against the active window. The streamer chooses which supported outcome to lock. The server then generates a downloadable SVG decision artifact, while the client animates and voices the result.
 
 ## Testing Instructions
 
@@ -53,7 +56,7 @@ Twitch EventSub chat messages enter a Fastify server through a normalized adapte
 4. Run `npm run dev`.
 5. Open `http://localhost:4173/control` for the streamer control room.
 6. Open `http://localhost:4173/overlay` for the broadcast overlay.
-7. Use the simulator to verify the complete ritual without credentials, or configure the documented Twitch environment variables to connect a real channel.
+7. Use the simulator to verify summon → timed window → grounded factions → lock → decision-card download, or configure the documented Twitch environment variables to connect a real channel.
 8. Run `npm run verify` to execute tests, strict TypeScript checking, and a production build.
 
 ## Public Demo Link
@@ -74,9 +77,11 @@ This render is intentionally marked provisional because its simulator shot must 
 
 1. Control room in ready state with source provenance visible
 2. Summoning ritual with the spirit reacting to chat
-3. Grounded answer with representative messages and confidence
-4. Broadcast overlay with the final voice co-host moment
-5. Brief Codex evidence and public repository proof
+3. Timed decision window with participant count
+4. Grounded faction split with representative sources and support counts
+5. Explicit faction lock and clean broadcast outcome
+6. Downloaded decision card
+7. Brief Codex evidence and public repository proof
 
 ## Submission Readiness Notes
 

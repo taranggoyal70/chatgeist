@@ -1,5 +1,5 @@
 export type SourceMode = "simulator" | "twitch";
-export type Phase = "dormant" | "summoning" | "present" | "collecting" | "grounding" | "answer-ready" | "speaking" | "remembered" | "error";
+export type Phase = "dormant" | "summoning" | "present" | "collecting" | "grounding" | "answer-ready" | "speaking" | "locked" | "remembered" | "error";
 
 export interface ChatMessage {
   id: string;
@@ -21,6 +21,17 @@ export interface SplitState {
   active: boolean;
   leftLabel: string;
   rightLabel: string;
+  leftCount: number;
+  rightCount: number;
+}
+
+export interface LockedDecision {
+  title: string;
+  objective: string;
+  selection: "left" | "right" | "recommendation";
+  lockedAt: number;
+  participantCount: number;
+  sourceCount: number;
 }
 
 export interface ServiceHealth {
@@ -42,6 +53,10 @@ export interface ChatgeistState {
   sourceIds: string[];
   axes: SpiritAxes;
   split: SplitState;
+  participantCount: number;
+  collectionStartedAt: number | null;
+  collectionEndsAt: number | null;
+  decision: LockedDecision | null;
   statusText: string;
   voiceReady: boolean;
   voiceUrl: string;

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { computeAxes, localFallback, sanitizeChatText, selectVisibleMessages } from "./domain";
+import { computeAxes, localFallback, resolveDecisionChoice, sanitizeChatText, selectVisibleMessages } from "./domain";
+import type { ChatgeistState } from "./types";
 import type { ChatMessage } from "./types";
 
 const messages: ChatMessage[] = [
@@ -26,6 +27,7 @@ describe("Chatgeist domain", () => {
     const result = localFallback(messages, "What next?");
     expect(result.sourceIds).toEqual(["1", "2", "3"]);
     expect(result.answer).toContain("grounded snapshot");
+    expect(result.split.leftSupportIds.length + result.split.rightSupportIds.length).toBe(3);
   });
 
   it("caps the visible orbit and prioritizes grounded sources", () => {
@@ -37,5 +39,18 @@ describe("Chatgeist domain", () => {
 
     expect(selectVisibleMessages(expanded, [], "collecting").map((message) => message.id)).toEqual(["4", "5", "6", "7", "8"]);
     expect(selectVisibleMessages(expanded, ["1", "3", "6"], "answer-ready").map((message) => message.id)).toEqual(["1", "3", "6"]);
+  });
+
+  it("turns a faction choice into a concrete locked objective", () => {
+    const state = {
+      split: { active: true, leftLabel: "No healing", rightLabel: "One shield", leftCount: 3, rightCount: 2 },
+      memoryPhrase: "Still divided",
+      answer: "The room is split."
+    } as ChatgeistState;
+    expect(resolveDecisionChoice(state, "right")).toEqual({
+      title: "One shield",
+      objective: "The community locked “One shield” as the outcome. Put it on stream now and let chat hold the decision.",
+      selection: "right"
+    });
   });
 });

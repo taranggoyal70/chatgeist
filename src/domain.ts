@@ -1,4 +1,4 @@
-import type { ChatMessage, Phase, SpiritAxes } from "./types";
+import type { ChatMessage, ChatgeistState, Phase, SpiritAxes } from "./types";
 
 const warmWords = new Set(["love", "great", "yes", "kind", "beautiful", "together", "we", "win", "good", "please", "heart", "gg"]);
 const chaoticWords = new Set(["chaos", "wild", "random", "crazy", "impossible", "no", "never", "fight", "versus", "vs"]);
@@ -37,6 +37,22 @@ export function selectVisibleMessages(messages: ChatMessage[], sourceIds: string
   return sources.length ? sources : messages.slice(-5);
 }
 
+export function resolveDecisionChoice(state: ChatgeistState, selection: "left" | "right" | "recommendation") {
+  if (state.split.active && selection !== "recommendation") {
+    const title = selection === "left" ? state.split.leftLabel : state.split.rightLabel;
+    return {
+      title,
+      objective: `The community locked “${title}” as the outcome. Put it on stream now and let chat hold the decision.`,
+      selection
+    };
+  }
+  return {
+    title: state.memoryPhrase || "The community recommendation",
+    objective: state.answer,
+    selection: "recommendation" as const
+  };
+}
+
 export function localFallback(messages: ChatMessage[], question: string) {
   const axes = computeAxes(messages);
   const visible = messages.slice(-5);
@@ -44,6 +60,9 @@ export function localFallback(messages: ChatMessage[], question: string) {
   const answer = keyPhrases.length
     ? `The room is leaning toward ${keyPhrases.join(", then ")}. The signal is ${axes.consensus > 0.62 ? "converging" : "still divided"}, so treat this as a grounded snapshot, not a unanimous vote.`
     : `I do not have enough eligible voices to answer “${question}” yet.`;
+  const leftSupport = visible.filter((message, index) => /shield|mercy|fair|kind|protect/i.test(message.text) || index % 2 === 0);
+  const leftIds = new Set(leftSupport.map((message) => message.id));
+  const rightSupport = visible.filter((message) => !leftIds.has(message.id));
   return {
     answer,
     sourceIds: visible.map((m) => m.id),
@@ -52,7 +71,9 @@ export function localFallback(messages: ChatMessage[], question: string) {
     split: {
       active: axes.consensus < 0.5 && messages.length >= 4,
       leftLabel: keyPhrases[0] || "One side",
-      rightLabel: keyPhrases[1] || "Another side"
+      rightLabel: keyPhrases[1] || "Another side",
+      leftSupportIds: leftSupport.map((message) => message.id),
+      rightSupportIds: rightSupport.map((message) => message.id)
     }
   };
 }

@@ -2,7 +2,7 @@
 
 > **Summon your community. Speak to its soul.**
 
-Chatgeist turns Twitch chat into a living 3D co-host. Messages shape a procedural spirit; a streamer asks the room a question; Chatgeist answers from a bounded evidence window while the representative messages remain visible around it.
+Chatgeist turns Twitch chat into a living 3D decision co-host. Messages shape a procedural spirit; a streamer opens a timed decision window; Chatgeist reveals grounded factions; the streamer locks one community outcome into the show and exports a shareable decision card.
 
 ![Chatgeist grounded answer](docs/assets/overlay-answer.png)
 
@@ -15,12 +15,14 @@ Fast Twitch chat becomes impossible to perceive as a community. Polls reduce it 
 1. **Summon** — eligible chat messages condense into one procedural spirit.
 2. **Ask** — the streamer asks one question from the private control room.
 3. **Ground** — Chatgeist considers only the active evidence window and returns a schema-validated answer with source message IDs.
-4. **Speak** — the answer becomes an AI-generated community voice; the exact text remains captioned.
-5. **Split** — if the room is divided, the spirit becomes two grounded factions instead of inventing consensus.
+4. **Split** — if the room is divided, the spirit becomes two grounded factions with visible support counts instead of inventing consensus.
+5. **Speak** — the recommendation becomes an AI-generated community voice; the exact text remains captioned.
+6. **Lock** — the streamer selects the community outcome that becomes binding on stream.
+7. **Share** — Chatgeist exports a 1600×900 SVG decision card with the locked objective, participation proof, and representative sources.
 
 ## Product surfaces
 
-- `/control` — private streamer controls, connection health, question input, voice playback, source counts, and reset.
+- `/control` — private streamer controls, connection health, question input, faction locking, voice playback, artifact download, source counts, and reset.
 - `/overlay` — broadcast-clean OBS browser source with no credentials or private controls.
 
 ![Private control room](docs/assets/control-answer.png)
@@ -62,7 +64,7 @@ Open:
 - Control room: `http://localhost:4173/control`
 - OBS overlay: `http://localhost:4173/overlay`
 
-The simulator works without Twitch credentials. Select **Simulator**, click **Summon the room**, then **Ask the room**.
+The simulator works without Twitch credentials. Select **Simulator**, click **Summon the room**, then **Ask the room**. The six-second rehearsal window demonstrates the same state transitions as the 30-second live Twitch window. Choose a faction, click **Lock**, then download the resulting decision card.
 
 ## Connect Twitch
 
@@ -105,6 +107,9 @@ Verified locally on November 2, 2026:
 
 - Simulator summoning completes without console errors.
 - Structured OpenAI grounding returns source-backed output.
+- Question evidence is isolated from the earlier summoning window.
+- Timed collection, unique-participant counts, faction support, and explicit outcome locking complete end to end.
+- Locked decisions export as server-generated 1600×900 SVG cards.
 - AI speech produces a playable MP3.
 - WebGL failure degrades to a CSS procedural spirit without crashing.
 - The 1280×720 broadcast overlay remains legible.
