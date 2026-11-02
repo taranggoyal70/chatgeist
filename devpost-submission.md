@@ -75,19 +75,21 @@ This render is intentionally marked provisional because its simulator shot must 
 
 ## Screenshot Shot List
 
-1. Control room in ready state with source provenance visible
-2. Summoning ritual with the spirit reacting to chat
-3. Timed decision window with participant count
-4. Grounded faction split with representative sources and support counts
-5. Explicit faction lock and clean broadcast outcome
-6. Downloaded decision card
-7. Brief Codex evidence and public repository proof
+1. Verified **LIVE TWITCH** overlay receiving three real `taranggoyal` chat messages
+2. Control room with Twitch health `ready` and input source set to Twitch
+3. Summoning ritual with the spirit reacting to chat
+4. Timed decision window with participant count
+5. Grounded faction split with representative sources and support counts
+6. Explicit faction lock and clean broadcast outcome
+7. Downloaded decision card
+8. Brief Codex evidence and public repository proof
 
 ## Submission Readiness Notes
 
 - Public repository is available and contains all source code, assets, setup instructions, and tests.
 - The project title, tagline, description, technology list, repository link, and thumbnail are saved on Devpost.
 - The app has passed unit tests, strict TypeScript checking, production build, and browser QA.
+- Twitch public-client device authorization, token validation, EventSub subscription, and real chat ingestion are verified end to end.
 - The provisional HyperFrames film passes its technical and accessibility checks.
 - The Devpost project is **not submitted**. `submitted_at` is null.
 

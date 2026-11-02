@@ -117,6 +117,7 @@ Verified locally on November 2, 2026:
 
 ## Demo evidence
 
+- [Verified Live Twitch ingestion](docs/assets/overlay-live-twitch.png)
 - [Initial control room](docs/assets/control-ready.png)
 - [Summoned community](docs/assets/control-summoned.png)
 - [Grounded answer and faction split](docs/assets/control-answer.png)
