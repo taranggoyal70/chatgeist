@@ -144,20 +144,22 @@ button:disabled { opacity: .38; cursor: not-allowed; }
 }
 
 @media (max-width: 520px) {
-  .control-shell { grid-template-rows: 920px auto; }
+  .control-shell { grid-template-areas: "panel" "preview"; grid-template-rows: auto 820px; }
+  .control-preview { grid-area: preview; }
+  .control-panel { grid-area: panel; }
   .control-preview .is-compact .observatory__chrome { padding: 22px; }
   .control-preview .is-compact .signal-header { align-items: flex-start; }
   .control-preview .is-compact .signal-header strong { font-size: 14px; }
   .control-preview .is-compact .mode-ribbon { max-width: 178px; padding: 8px 11px; line-height: 1.35; }
-  .control-preview .is-compact[data-phase="answer-ready"] .ritual-copy,
-  .control-preview .is-compact[data-phase="speaking"] .ritual-copy,
-  .control-preview .is-compact[data-phase="collecting"] .ritual-copy,
-  .control-preview .is-compact[data-phase="grounding"] .ritual-copy {
+  .control-preview .is-compact .ritual-copy {
     align-self: start;
     width: calc(100% - 44px);
     margin-top: 88px;
     transform: none;
   }
+  .control-preview .is-compact .sky { top: 500px; bottom: auto; height: 230px; }
+  .control-preview .is-compact .spirit-fallback.is-split { gap: 8px; padding-inline: 12%; }
+  .control-preview .is-compact .spirit-fallback.is-split .fallback-spirit { width: 96px; }
   .control-preview .is-compact[data-phase="answer-ready"] .ritual-copy h1,
   .control-preview .is-compact[data-phase="speaking"] .ritual-copy h1,
   .control-preview .is-compact[data-phase="collecting"] .ritual-copy h1,
@@ -175,8 +177,6 @@ button:disabled { opacity: .38; cursor: not-allowed; }
     line-height: 1.32;
   }
   .control-preview .is-compact .voice-disclosure { max-width: 100%; margin: 10px 0 0 16px; font-size: 10px; }
-  .control-preview .is-compact .spirit-fallback.is-split { grid-template-columns: 1fr 1fr; gap: 8px; padding: 600px 22px 150px 38%; }
-  .control-preview .is-compact .spirit-fallback.is-split .fallback-spirit { width: 96px; }
   .control-preview .is-compact[data-phase="answer-ready"] .faction-key,
   .control-preview .is-compact[data-phase="speaking"] .faction-key { bottom: 68px; width: calc(100% - 44px); gap: 6px; }
   .control-preview .is-compact .faction-key span { padding-inline: 4px; }
