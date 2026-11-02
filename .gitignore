@@ -1,0 +1,10 @@
+.env.local
+.devpost-hackathon-state.json
+.gstack/
+node_modules/
+dist/
+test-results/
+playwright-report/
+docs/designs/*.review.*/
+docs/hackathon-build/
+.DS_Store

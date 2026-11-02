@@ -1,0 +1,30 @@
+import { describe, expect, it } from "vitest";
+import { computeAxes, localFallback, sanitizeChatText } from "./domain";
+import type { ChatMessage } from "./types";
+
+const messages: ChatMessage[] = [
+  { id: "1", userId: "a", userName: "Maya", text: "we love impossible mode", timestamp: 1, source: "simulator" },
+  { id: "2", userId: "b", userName: "Jon", text: "yes impossible mode", timestamp: 2, source: "simulator" },
+  { id: "3", userId: "c", userName: "Rin", text: "no healing, pure chaos", timestamp: 3, source: "simulator" }
+];
+
+describe("Chatgeist domain", () => {
+  it("derives bounded visual axes", () => {
+    const axes = computeAxes(messages);
+    for (const value of Object.values(axes)) expect(value).toBeGreaterThanOrEqual(0);
+    for (const value of Object.values(axes)) expect(value).toBeLessThanOrEqual(1);
+    expect(axes.energy).toBeGreaterThan(0.3);
+  });
+
+  it("rejects URLs and overlength chat", () => {
+    expect(sanitizeChatText("https://example.com" )).toBeNull();
+    expect(sanitizeChatText("x".repeat(181))).toBeNull();
+    expect(sanitizeChatText("  one   more run  ")).toBe("one more run");
+  });
+
+  it("creates a truthful local fallback", () => {
+    const result = localFallback(messages, "What next?");
+    expect(result.sourceIds).toEqual(["1", "2", "3"]);
+    expect(result.answer).toContain("grounded snapshot");
+  });
+});
