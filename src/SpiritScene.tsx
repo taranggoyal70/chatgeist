@@ -12,7 +12,7 @@ function SpiritBody({ axes, side = 0 }: { axes: SpiritAxes; side?: number }) {
   const color = useMemo(() => {
     const cold = new Color("#72f7ff");
     const warm = new Color("#ff7d73");
-    return cold.lerp(warm, axes.warmth).getStyle();
+    return cold.lerp(warm, axes.warmth).offsetHSL(0, 0.16, 0.04).getStyle();
   }, [axes.warmth]);
 
   useFrame(({ clock }, delta) => {
@@ -25,30 +25,30 @@ function SpiritBody({ axes, side = 0 }: { axes: SpiritAxes; side?: number }) {
 
   return (
     <Float speed={1.2 + axes.energy} rotationIntensity={0.18 + axes.chaos * 0.45} floatIntensity={0.35}>
-      <group ref={group} position={[side * 1.55, 0, 0]}>
+      <group ref={group} position={[1.25 + side * 1.7, 0.08, 0]}>
         <mesh ref={core}>
-          <icosahedronGeometry args={[1.05, 5]} />
+          <icosahedronGeometry args={[0.82, 5]} />
           <MeshDistortMaterial
             color={color}
             emissive={color}
-            emissiveIntensity={0.45 + axes.energy * 0.75}
-            roughness={0.18}
-            metalness={0.42}
-            distort={0.13 + axes.chaos * 0.45}
-            speed={1.1 + axes.energy * 2.6}
+            emissiveIntensity={0.16 + axes.energy * 0.34}
+            roughness={0.32}
+            metalness={0.26}
+            distort={0.09 + axes.chaos * 0.3}
+            speed={0.9 + axes.energy * 1.8}
             transparent
-            opacity={0.78}
+            opacity={0.86}
           />
         </mesh>
-        <mesh scale={1.22}>
-          <icosahedronGeometry args={[1.05, 2]} />
-          <meshBasicMaterial color="#a78bfa" wireframe transparent opacity={0.18 + axes.consensus * 0.25} />
+        <mesh scale={1.18}>
+          <icosahedronGeometry args={[0.82, 2]} />
+          <meshBasicMaterial color="#a78bfa" wireframe transparent opacity={0.16 + axes.consensus * 0.2} />
         </mesh>
-        <mesh position={[-0.32, 0.12, 0.93]} scale={0.08}>
+        <mesh position={[-0.25, 0.1, 0.73]} scale={0.065}>
           <sphereGeometry />
           <meshBasicMaterial color="#f2c96d" />
         </mesh>
-        <mesh position={[0.32, 0.12, 0.93]} scale={0.08}>
+        <mesh position={[0.25, 0.1, 0.73]} scale={0.065}>
           <sphereGeometry />
           <meshBasicMaterial color="#f2c96d" />
         </mesh>
@@ -80,18 +80,18 @@ export function SpiritScene({ state }: { state: ChatgeistState }) {
     );
   }
   return (
-    <Canvas camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 1.6]} gl={{ alpha: true, antialias: true }}>
+    <Canvas camera={{ position: [0, 0, 7.4], fov: 44 }} dpr={[1, 1.6]} gl={{ alpha: true, antialias: true }}>
       <color attach="background" args={["#050815"]} />
       <fog attach="fog" args={["#050815", 6, 12]} />
-      <ambientLight intensity={0.34} />
-      <pointLight position={[0, 2, 4]} color="#72f7ff" intensity={8} />
-      <pointLight position={[-4, -2, 2]} color="#a78bfa" intensity={6} />
-      <Stars radius={45} depth={30} count={950} factor={2.5} saturation={0.2} fade speed={0.35} />
-      <Sparkles count={90 + Math.round(state.axes.energy * 170)} scale={[7, 4, 3]} size={1.5} speed={0.15 + state.axes.energy * 0.7} color="#72f7ff" opacity={0.48} />
+      <ambientLight intensity={0.24} />
+      <pointLight position={[1, 2, 4]} color="#72f7ff" intensity={3.4} />
+      <pointLight position={[-4, -2, 2]} color="#a78bfa" intensity={2.6} />
+      <Stars radius={45} depth={30} count={850} factor={2.2} saturation={0.2} fade speed={0.28} />
+      <Sparkles count={70 + Math.round(state.axes.energy * 120)} scale={[8, 4, 3]} size={1.15} speed={0.12 + state.axes.energy * 0.45} color="#72f7ff" opacity={0.36} />
       {split ? <><SpiritBody axes={state.axes} side={-0.8} /><SpiritBody axes={{ ...state.axes, warmth: 1 - state.axes.warmth }} side={0.8} /></> : <SpiritBody axes={state.axes} />}
       <EffectComposer multisampling={0}>
-        <Bloom luminanceThreshold={0.22} luminanceSmoothing={0.65} intensity={1.45} mipmapBlur />
-        <Vignette eskil={false} offset={0.22} darkness={0.72} />
+        <Bloom luminanceThreshold={0.58} luminanceSmoothing={0.48} intensity={0.78} mipmapBlur />
+        <Vignette eskil={false} offset={0.18} darkness={0.62} />
       </EffectComposer>
     </Canvas>
   );
