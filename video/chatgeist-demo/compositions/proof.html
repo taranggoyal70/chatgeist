@@ -1,27 +1,24 @@
 <template>
   <style>
     #root { position: absolute; inset: 0; overflow: hidden; background: #050815; font-family: Outfit, sans-serif; }
-    #proof-shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    #proof-focus { position: absolute; left: 70px; top: 150px; width: 780px; height: 620px; border: 3px solid #72f7ff; box-shadow: 0 0 40px rgba(114,247,255,.3); }
-    #proof-source { position: absolute; right: 72px; top: 84px; width: 520px; padding: 22px; color: #f6f2e8; border-left: 5px solid #f2c96d; background: rgba(5,8,21,.9); font: 700 34px/1.24 Outfit, sans-serif; }
-    #proof-source small { display: block; margin-top: 16px; color: #72f7ff; font: 400 28px/1.35 IBM Plex Mono, monospace; letter-spacing: .035em; }
-    #proof-disclosure { position: absolute; right: 72px; bottom: 78px; color: #f2c96d; font: 700 28px/1 IBM Plex Mono, monospace; letter-spacing: .08em; }
-    #proof-progress { position: absolute; left: 70px; bottom: 68px; height: 5px; width: 880px; background: #72f7ff; transform-origin: left; }
+    .capture { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    #proof-hold { opacity: 1; }
+    #proof-badge { position: absolute; top: 54px; left: 62px; padding: 14px 18px; border: 2px solid #72f7ff; color: #72f7ff; background: rgba(5,8,21,.9); font: 700 28px/1 IBM Plex Mono, monospace; letter-spacing: .09em; text-transform: uppercase; }
+    #proof-progress-base { position: absolute; right: 0; bottom: 0; left: 0; height: 6px; background: rgba(152,165,189,.22); }
+    #proof-progress { position: absolute; right: 0; bottom: 0; left: 0; height: 6px; background: linear-gradient(90deg, #a78bfa, #72f7ff); transform-origin: left; }
   </style>
-  <div data-hf-id="hf-s4mz" id="root" data-composition-id="proof" data-width="1920" data-height="1080">
-    <img data-hf-id="hf-r0nm" id="proof-shot" class="clip" data-layout-allow-overflow data-start="0" data-duration="15.6" src="assets/overlay-answer.png" alt="Verified Chatgeist answer and source provenance" />
-    <div data-hf-id="hf-so77" id="proof-focus" class="clip" data-start="0" data-duration="15.6"></div>
-    <div data-hf-id="hf-l166" id="proof-source" class="clip" data-start=".3" data-duration="15.3">Every sentence keeps its sources.<small data-hf-id="hf-3n96">Structured answer · validated source IDs · disagreement preserved</small></div>
-    <div data-hf-id="hf-zlz3" id="proof-disclosure" class="clip" data-start=".3" data-duration="15.3">AI-GENERATED COMMUNITY VOICE</div>
-    <div data-hf-id="hf-vo4a" id="proof-progress" class="clip" data-start=".45" data-duration="14.8"></div>
+  <div id="root" data-composition-id="proof" data-width="1920" data-height="1080">
+    <video id="proof-video" class="clip capture" data-layout-allow-overflow data-start="0" data-duration="34.683" data-media-start=".25" src="assets/product-run.mp4" muted playsinline aria-label="Actual Chatgeist product capture from verified Live Twitch proof through locked simulator decision"></video>
+    <img id="proof-hold" class="clip capture" data-layout-allow-overflow data-start="34.683" data-duration="12.917" src="assets/product-run-final.jpg" alt="Actual final locked Chatgeist product state" />
+    <div id="proof-badge" class="clip" data-layout-allow-overlap data-start="0" data-duration="47.6">Actual product capture</div>
+    <div id="proof-progress-base" class="clip" data-layout-allow-overlap data-start="0" data-duration="47.6"></div>
+    <div id="proof-progress" class="clip" data-layout-allow-overlap data-start="0" data-duration="47.6"></div>
   </div>
   <script>
     const tl = gsap.timeline({ paused: true });
-    tl.fromTo("#proof-shot", { scale: 1.03 }, { scale: 1.13, x: -90, duration: 15.5, ease: "none" }, 0);
-    tl.fromTo("#proof-focus", { opacity: 0, scale: .96 }, { opacity: 1, scale: 1, duration: .45, ease: "power3.out" }, .08);
-    tl.fromTo("#proof-source", { opacity: 0, x: 52 }, { opacity: 1, x: 0, duration: .48, ease: "power4.out" }, .28);
-    tl.fromTo("#proof-disclosure", { opacity: 0 }, { opacity: 1, duration: .35 }, .42);
-    tl.fromTo("#proof-progress", { scaleX: 0 }, { scaleX: 1, duration: 14.45, ease: "none" }, .45);
+    tl.fromTo("#proof-badge", { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: .4, ease: "power3.out" }, .15);
+    tl.fromTo("#proof-hold", { opacity: 0 }, { opacity: 1, duration: .22, ease: "power2.out" }, 34.683);
+    tl.fromTo("#proof-progress", { scaleX: 0 }, { scaleX: 1, duration: 47.5, ease: "none" }, 0);
     window.__timelines.proof = tl;
   </script>
 </template>

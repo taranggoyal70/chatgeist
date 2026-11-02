@@ -175,6 +175,13 @@ button:disabled { opacity: .38; cursor: not-allowed; }
 .is-compact .signal-footer { grid-template-columns: repeat(4, minmax(70px, 1fr)); }
 .is-compact .signal-footer > p { display: none; }
 
+@media (max-width: 1400px) {
+  [data-phase="answer-ready"] .ritual-copy blockquote,
+  [data-phase="speaking"] .ritual-copy blockquote { font-size: clamp(18px, 1.75vw, 24px); line-height: 1.24; }
+  [data-phase="answer-ready"] .message-fragment.fragment-4,
+  [data-phase="speaking"] .message-fragment.fragment-4 { display: none; }
+}
+
 @media (max-width: 900px) {
   .control-shell { grid-template-columns: 1fr; grid-template-rows: 54vh 46vh; overflow: auto; }
   .control-preview { border-right: 0; border-bottom: 1px solid rgba(152,165,189,.2); }

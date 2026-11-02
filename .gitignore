@@ -11,5 +11,8 @@ docs/hackathon-build/
 video/chatgeist-demo/.hyperframes/
 video/chatgeist-demo/.thumbnails/
 video/chatgeist-demo/.waveform-cache/
+video/chatgeist-demo/.media/
+video/chatgeist-demo/assets/product-run-frames/
+video/chatgeist-demo/assets/product-run.webm
 video/chatgeist-demo/renders/
 .DS_Store

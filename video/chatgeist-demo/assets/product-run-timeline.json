@@ -1,0 +1,28 @@
+{
+  "fps": 6.949084591741281,
+  "frames": 208,
+  "duration": 34.932,
+  "dynamicDuration": 29.932,
+  "phases": [
+    {
+      "name": "live-proof",
+      "at": 0
+    },
+    {
+      "name": "summoning",
+      "at": 5.8100000000000005
+    },
+    {
+      "name": "decision-window",
+      "at": 8.416
+    },
+    {
+      "name": "grounded-factions",
+      "at": 26.115
+    },
+    {
+      "name": "locked",
+      "at": 30.125
+    }
+  ]
+}
