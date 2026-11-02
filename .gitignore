@@ -1,4 +1,5 @@
 .env.local
+.env.twitch.local
 .devpost-hackathon-state.json
 .gstack/
 node_modules/

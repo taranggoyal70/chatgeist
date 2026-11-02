@@ -5,15 +5,26 @@ import { Overlay } from "./Overlay";
 export function ControlRoom({ state, error, act }: { state: ChatgeistState; error: string; act: (path: string, body?: unknown) => Promise<unknown> }) {
   const [question, setQuestion] = useState("Chat, what challenge should I do next?");
   const [busy, setBusy] = useState(false);
+  const [twitchDevice, setTwitchDevice] = useState<{ userCode: string; verificationUri: string } | null>(null);
   const audio = useRef<HTMLAudioElement>(null);
 
   async function run(path: string, body?: unknown) {
     setBusy(true);
-    try { await act(path, body); } finally { setBusy(false); }
+    try { return await act(path, body); } finally { setBusy(false); }
   }
 
   async function ask() {
     await run("/api/ask", { question });
+  }
+
+  async function startTwitchAuth() {
+    const result = await run("/api/twitch/device") as { userCode: string; verificationUri: string };
+    setTwitchDevice(result);
+  }
+
+  async function checkTwitchAuth() {
+    const result = await run("/api/twitch/device/poll") as { status: string };
+    if (result.status === "authorized") setTwitchDevice(null);
   }
 
   function playVoice() {
@@ -40,6 +51,13 @@ export function ControlRoom({ state, error, act }: { state: ChatgeistState; erro
             <button role="radio" aria-checked={state.mode === "simulator"} className={state.mode === "simulator" ? "active" : ""} onClick={() => run("/api/mode", { mode: "simulator" })}>Simulator</button>
             <button role="radio" aria-checked={state.mode === "twitch"} className={state.mode === "twitch" ? "active" : ""} onClick={() => run("/api/mode", { mode: "twitch" })} disabled={state.health.twitch !== "ready"}>Twitch</button>
           </div>
+          {state.health.twitch !== "ready" && !twitchDevice && <button className="twitch-connect" onClick={startTwitchAuth} disabled={busy}>Connect Twitch securely</button>}
+          {twitchDevice && <div className="twitch-device-card">
+            <span>Activation code</span>
+            <strong>{twitchDevice.userCode}</strong>
+            <a href={twitchDevice.verificationUri} target="_blank" rel="noreferrer">Open Twitch authorization ↗</a>
+            <button onClick={checkTwitchAuth} disabled={busy}>I authorized Chatgeist</button>
+          </div>}
           <button className="action action--summon" onClick={() => run("/api/summon")} disabled={busy}>Summon the room</button>
         </section>
 

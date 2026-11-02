@@ -140,6 +140,11 @@ button:disabled { opacity: .38; cursor: not-allowed; }
 .control-panel button:hover:not(:disabled) { border-color: var(--cyan); transform: translateY(-1px); }
 .segmented button.active { background: rgba(114,247,255,.1); border-color: var(--cyan); color: var(--cyan); }
 .segmented button.active::before { content: "✓ "; color: var(--gold); }
+.control-panel .twitch-connect { border-color: rgba(167,139,250,.65); color: #c4b5fd; }
+.twitch-device-card { display: grid; gap: 8px; padding: 12px; border: 1px solid rgba(167,139,250,.5); background: rgba(167,139,250,.07); }
+.twitch-device-card span { color: var(--muted); font: 10px/1 ui-monospace, monospace; letter-spacing: .1em; text-transform: uppercase; }
+.twitch-device-card strong { color: var(--paper); font: 24px/1.1 ui-monospace, monospace; letter-spacing: .18em; }
+.twitch-device-card a { color: var(--cyan); text-underline-offset: 4px; }
 .control-panel .action { background: linear-gradient(135deg, rgba(167,139,250,.25), rgba(114,247,255,.16)); border-color: rgba(114,247,255,.68); font-weight: 650; }
 .control-panel .action--summon { min-height: 50px; text-transform: uppercase; letter-spacing: .12em; font-size: 11px; }
 .control-panel .lock-action { min-height: 54px; border-color: var(--gold); background: var(--gold); color: var(--void); font-weight: 750; text-transform: uppercase; letter-spacing: .12em; }

@@ -10,6 +10,7 @@ import { buildDecisionArtifact } from "../src/artifact";
 import { emptySplitState, neutralAxes, type ChatMessage, type ChatgeistState, type DecisionSelection, type SourceMode } from "../src/types";
 
 loadEnv({ path: ".env.local", override: false });
+loadEnv({ path: ".env.twitch.local", override: false });
 
 const PORT = Number(process.env.PORT ?? 4317);
 const SIMULATOR_COLLECTION_MS = 6_000;
@@ -19,6 +20,11 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPE
 let latestAudio: Buffer | null = null;
 let activeInteraction = 0;
 let twitchSocket: WebSocket | null = null;
+const twitchClientId = process.env.TWITCH_CLIENT_ID ?? "";
+let twitchAccessToken = process.env.TWITCH_USER_ACCESS_TOKEN ?? "";
+let twitchBroadcasterId = process.env.TWITCH_BROADCASTER_ID ?? "";
+let twitchUserId = process.env.TWITCH_USER_ID ?? "";
+let twitchDeviceSession: { deviceCode: string; userCode: string; verificationUri: string; expiresAt: number; intervalMs: number; nextPollAt: number } | null = null;
 let lastAcceptedByUser = new Map<string, number>();
 let acceptedTexts = new Set<string>();
 let acceptedMessageIds = new Set<string>();
@@ -74,7 +80,7 @@ let state = initialState();
 const wss = new WebSocketServer({ server: app.server, path: "/ws" });
 
 function hasTwitchConfig() {
-  return Boolean(process.env.TWITCH_CLIENT_ID && process.env.TWITCH_USER_ACCESS_TOKEN && process.env.TWITCH_BROADCASTER_ID && process.env.TWITCH_USER_ID);
+  return Boolean(twitchClientId && twitchAccessToken && twitchBroadcasterId && twitchUserId);
 }
 
 function update(patch: Partial<ChatgeistState>) {
@@ -267,6 +273,67 @@ async function ground(question: string, interactionId: number) {
 
 app.get("/api/state", async () => state);
 app.get("/api/health", async () => state.health);
+app.post("/api/twitch/device", async (_request, reply) => {
+  if (!twitchClientId) return reply.code(409).send({ error: "TWITCH_CLIENT_ID is not configured." });
+  const response = await fetch("https://id.twitch.tv/oauth2/device", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ client_id: twitchClientId, scopes: "user:read:chat" })
+  });
+  if (!response.ok) return reply.code(502).send({ error: `Twitch device authorization returned ${response.status}.` });
+  const payload = await response.json() as { device_code: string; expires_in: number; interval: number; user_code: string; verification_uri: string };
+  const now = Date.now();
+  twitchDeviceSession = {
+    deviceCode: payload.device_code,
+    userCode: payload.user_code,
+    verificationUri: payload.verification_uri,
+    expiresAt: now + payload.expires_in * 1_000,
+    intervalMs: payload.interval * 1_000,
+    nextPollAt: now
+  };
+  update({ health: { ...state.health, twitch: "connecting" }, statusText: "Twitch authorization is waiting for the streamer." });
+  return { userCode: payload.user_code, verificationUri: payload.verification_uri, expiresAt: twitchDeviceSession.expiresAt, intervalMs: twitchDeviceSession.intervalMs };
+});
+
+app.post("/api/twitch/device/poll", async (_request, reply) => {
+  if (!twitchDeviceSession) return reply.code(409).send({ error: "Start Twitch authorization first." });
+  const now = Date.now();
+  if (now >= twitchDeviceSession.expiresAt) {
+    twitchDeviceSession = null;
+    update({ health: { ...state.health, twitch: "missing" }, statusText: "Twitch authorization expired. Start it again." });
+    return reply.code(410).send({ error: "Twitch authorization expired." });
+  }
+  if (now < twitchDeviceSession.nextPollAt) return { status: "pending", retryAfterMs: twitchDeviceSession.nextPollAt - now };
+  twitchDeviceSession.nextPollAt = now + twitchDeviceSession.intervalMs;
+  const response = await fetch("https://id.twitch.tv/oauth2/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: twitchClientId,
+      scopes: "user:read:chat",
+      device_code: twitchDeviceSession.deviceCode,
+      grant_type: "urn:ietf:params:oauth:grant-type:device_code"
+    })
+  });
+  const payload = await response.json() as { access_token?: string; message?: string };
+  if (!response.ok) {
+    if (payload.message === "authorization_pending") return { status: "pending", retryAfterMs: twitchDeviceSession.intervalMs };
+    return reply.code(502).send({ error: payload.message || `Twitch token exchange returned ${response.status}.` });
+  }
+  if (!payload.access_token) return reply.code(502).send({ error: "Twitch token exchange returned no access token." });
+  const validation = await fetch("https://id.twitch.tv/oauth2/validate", { headers: { Authorization: `OAuth ${payload.access_token}` } });
+  if (!validation.ok) return reply.code(502).send({ error: "Twitch token validation failed." });
+  const identity = await validation.json() as { user_id?: string; login?: string };
+  if (!identity.user_id) return reply.code(502).send({ error: "Twitch token did not include a user identity." });
+  twitchAccessToken = payload.access_token;
+  twitchBroadcasterId = identity.user_id;
+  twitchUserId = identity.user_id;
+  twitchDeviceSession = null;
+  update({ health: { ...state.health, twitch: "connecting" }, statusText: `Twitch authorized as ${identity.login || "streamer"}. Connecting chat…` });
+  void connectTwitch();
+  return { status: "authorized", login: identity.login || "streamer" };
+});
+
 app.get("/api/artifact.svg", async (_request, reply) => {
   if (!state.decision) return reply.code(404).send({ error: "Lock a decision before downloading its card." });
   return reply
@@ -374,11 +441,16 @@ app.post("/api/reset", async () => {
 
 async function connectTwitch() {
   if (!hasTwitchConfig()) return;
-  const token = process.env.TWITCH_USER_ACCESS_TOKEN!;
-  const clientId = process.env.TWITCH_CLIENT_ID!;
+  const token = twitchAccessToken;
+  const clientId = twitchClientId;
   try {
     const validation = await fetch("https://id.twitch.tv/oauth2/validate", { headers: { Authorization: `OAuth ${token}` } });
     if (!validation.ok) throw new Error(`Token validation returned ${validation.status}`);
+    const identity = await validation.json() as { user_id?: string };
+    twitchBroadcasterId ||= identity.user_id || "";
+    twitchUserId ||= identity.user_id || "";
+    if (!twitchBroadcasterId || !twitchUserId) throw new Error("Validated token did not include a user identity");
+    twitchSocket?.close();
     twitchSocket = new WebSocket("wss://eventsub.wss.twitch.tv/ws");
     twitchSocket.on("message", async (raw) => {
       const data = JSON.parse(raw.toString());
@@ -389,7 +461,7 @@ async function connectTwitch() {
           body: JSON.stringify({
             type: "channel.chat.message",
             version: "1",
-            condition: { broadcaster_user_id: process.env.TWITCH_BROADCASTER_ID, user_id: process.env.TWITCH_USER_ID },
+            condition: { broadcaster_user_id: twitchBroadcasterId, user_id: twitchUserId },
             transport: { method: "websocket", session_id: data.payload.session.id }
           })
         });

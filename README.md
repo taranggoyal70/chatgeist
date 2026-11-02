@@ -69,23 +69,23 @@ The simulator works without Twitch credentials. Select **Simulator**, click **Su
 
 ## Connect Twitch
 
-Chatgeist implements Twitch's official installed-chatbot flow using EventSub WebSockets. Register an application in the Twitch Developer Console and create a user access token with `user:read:chat`.
+Chatgeist implements Twitch's official public-client device-code flow and EventSub WebSockets. Register a **Public** Chat Bot application in the Twitch Developer Console, then set only its public Client ID:
 
 Set these values in `.env.local`:
 
 ```dotenv
 TWITCH_CLIENT_ID=
-TWITCH_USER_ACCESS_TOKEN=
-TWITCH_BROADCASTER_ID=
-TWITCH_USER_ID=
 ```
 
-Restart `npm run dev`. The Twitch health indicator becomes **ready** after token validation and the `channel.chat.message` subscription succeeds.
+Restart `npm run dev`, click **Connect Twitch securely**, open the displayed Twitch authorization URL, and approve `user:read:chat`. Chatgeist keeps the access token in server memory, derives the broadcaster/user ID from Twitch's validation response, and never exposes the token to the browser UI. The Twitch health indicator becomes **ready** after the `channel.chat.message` subscription succeeds.
+
+The legacy manual token variables in `.env.example` remain available for automated environments.
 
 Official references:
 
 - [Twitch Example Chatbot](https://dev.twitch.tv/docs/chat/chatbot-guide/)
 - [Twitch chat authentication](https://dev.twitch.tv/docs/chat/authenticating/)
+- [Twitch device-code authentication](https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#device-code-grant-flow)
 - [EventSub WebSocket handling](https://dev.twitch.tv/docs/eventsub/handling-websocket-events/)
 
 ## OBS
